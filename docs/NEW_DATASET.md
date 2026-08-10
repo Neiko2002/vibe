@@ -1,6 +1,6 @@
 # New dataset guide
 
-New datasets are defined in [`vibe/datasets.py`](vibe/datasets.py).
+New datasets are defined in [`vibe/datasets.py`](../vibe/datasets.py).
 
 ## 1. Define the dataset
 

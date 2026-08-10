@@ -5,7 +5,7 @@ Under `vibe/algorithms/<algorithm>/`, add:
 - `module.py` adapter
 - `config.yml` parameter grid
 
-See e.g. [hnswlib](vibe/algorithms/hnswlib/) for a small working example.
+See e.g. [hnswlib](../vibe/algorithms/hnswlib/) for a small working example.
 
 ## 1. Build the image
 
@@ -111,4 +111,4 @@ Set `gpu: true` for GPU methods. They run only with `run.py --gpu` and must impl
 
 ## 4. Update the README and open a pull request
 
-Add the method and pinned implementation version to the [README](README.md), then open a pull request.
+Add the method and pinned implementation version to the [README](../README.md), then open a pull request.

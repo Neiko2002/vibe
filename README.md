@@ -171,11 +171,15 @@ export VIBE_CACHE=$LOCAL_SCRATCH
 > [!TIP]
 > See an [example Slurm job](slurm/dataset.sh) for creating datasets using Slurm.
 
+### Adding a new dataset to the benchmark
+
+See the [new dataset guide](docs/NEW_DATASET.md) for instructions on creating a dataset.
+
 ### Adding a new method to the benchmark
 
 VIBE is an on-going effort and we actively welcome new additions to the benchmarks.
 
-See the [new method guide](NEW_METHOD.md). In short, add your algorithm in the folder `vibe/algorithms/{METHOD}/` by providing:
+See the [new method guide](docs/NEW_METHOD.md). In short, add your algorithm in the folder `vibe/algorithms/{METHOD}/` by providing:
 
 - Python wrapper in `module.py`
 - Singularity container definition in `image.def`
