@@ -171,10 +171,6 @@ export VIBE_CACHE=$LOCAL_SCRATCH
 > [!TIP]
 > See an [example Slurm job](slurm/dataset.sh) for creating datasets using Slurm.
 
-### Adding a new dataset to the benchmark
-
-See the [new dataset guide](docs/NEW_DATASET.md) for instructions on creating a dataset.
-
 ### Adding a new method to the benchmark
 
 VIBE is an on-going effort and we actively welcome new additions to the benchmarks.
@@ -186,6 +182,10 @@ See the [new method guide](docs/NEW_METHOD.md). In short, add your algorithm in 
 - Hyperparameter grid in `config.yml`
 
 Please refer to e.g. the [hnswlib module](https://github.com/vector-index-bench/vibe/tree/main/vibe/algorithms/hnswlib) for a reference implementation.
+
+### Adding a new dataset to the benchmark
+
+See the [new dataset guide](docs/NEW_DATASET.md) for instructions on creating a dataset.
 
 ### Running the website locally
 
