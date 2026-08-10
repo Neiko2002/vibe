@@ -101,9 +101,9 @@ float:
           search_budget: [20, 40, 80, 160]
 ```
 
-Fill in `name`, `module`, `constructor`, and `singularity_image` (usually just the name the method for each).
+Fill in `name`, `module`, `constructor`, and `singularity_image` (usually just the name of the method for each).
 
-The outer key selects the dataset's point representation: `float` for regular floating-point vectors, `int8`, `uint8`, or `binary` for quantized vectors. The next key is a supported distance (`euclidean`, `cosine`, `ip`, `normalized`, or `hamming`) or `any` if the same definition supports all distances.
+The outer key selects the supported datatype: `float` for regular float vectors, `int8`, `uint8`, or `binary` for quantized vectors. The next key is a supported distance (`euclidean`, `cosine`, `ip`, `normalized`, or `hamming`) or `any` if the method supports all distances.
 
 `args` and `query_args` are Cartesian-product grids passed positionally in YAML order. Put only index-building parameters in `args`. Generally, it's best to keep the number of indexing combinations below 20 and query combinations below 60.
 
