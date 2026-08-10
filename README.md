@@ -84,7 +84,7 @@ Building all library images can be done using
 ./install.sh
 ```
 
-Use `./install.sh --skip-gpu` if you don't need to benchmark GPU methods. To build an image for a single library:
+Use `./install.sh --skip-gpu` if you don't need GPU methods. To build an image for a single library:
 
 ```sh
 ./install.sh --algorithm hnswlib
@@ -175,11 +175,11 @@ export VIBE_CACHE=$LOCAL_SCRATCH
 
 VIBE is an on-going effort and we actively welcome new additions to the benchmarks.
 
-Add your algorithm in the folder `vibe/algorithms/{METHOD}/` by providing
+See the [new method guide](NEW_METHOD.md). In short, add your algorithm in the folder `vibe/algorithms/{METHOD}/` by providing:
 
-- Python wrapper in module.py
-- Singularity container defination in image.def
-- Hyperparameter grid in config.yml
+- Python wrapper in `module.py`
+- Singularity container definition in `image.def`
+- Hyperparameter grid in `config.yml`
 
 Please refer to e.g. the [hnswlib module](https://github.com/vector-index-bench/vibe/tree/main/vibe/algorithms/hnswlib) for a reference implementation.
 
