@@ -736,17 +736,22 @@ def performance_gap_plot(
     ax_pca_ood = fig.add_subplot(gs[1, 1])
     ax_mahalanobis_id = fig.add_subplot(gs[0, 2])
     ax_mahalanobis_ood = fig.add_subplot(gs[1, 2])
+    row_count = maindata.shape[0]
+    row_center = (row_count - 1) / 2
+    row_positions = (np.arange(row_count) - row_center) * 1.05 + row_center
+    algorithm_rows = dict(zip(maindata["algorithm"].to_list(), row_positions))
     ax_main.hlines(
-        range(maindata.shape[0]),
+        row_positions,
         xmin=maindata["out-of-distribution"],
         xmax=maindata["in-distribution"],
         color="gray",
         zorder=-1,
     )
-    ax_main.scatter(maindata["in-distribution"], maindata["algorithm"], color="tab:green")
-    ax_main.scatter(maindata["out-of-distribution"], maindata["algorithm"], color="tab:purple")
+    ax_main.scatter(maindata["in-distribution"], row_positions, color="tab:green")
+    ax_main.scatter(maindata["out-of-distribution"], row_positions, color="tab:purple")
 
     for algo in maindata["algorithm"].unique().to_list():
+        ypos = algorithm_rows[algo]
         xpos = (
             maindata.filter(pl.col("algorithm") == algo)[["in-distribution", "out-of-distribution"]]
             .transpose()
@@ -757,11 +762,17 @@ def performance_gap_plot(
         )
         if xpos is not None:
             ax_main.annotate(
-                xy=(xpos, algo), xytext=(-35, 0), textcoords="offset points", text=algo, ha="right", va="center", size=9
+                xy=(xpos, ypos),
+                xytext=(-35, 0),
+                textcoords="offset points",
+                text=algo,
+                ha="right",
+                va="center",
+                size=9,
             )
         if performance_ood is not None:
             ax_main.annotate(
-                xy=(performance_ood, algo),
+                xy=(performance_ood, ypos),
                 text=f"{performance_ood:.0f}",
                 ha="right" if performance_id > performance_ood else "left",
                 va="center",
@@ -772,7 +783,7 @@ def performance_gap_plot(
             )
         if performance_id is not None:
             ax_main.annotate(
-                xy=(performance_id, algo),
+                xy=(performance_id, ypos),
                 text=f"{performance_id:.0f}",
                 ha="left" if performance_id > performance_ood else "right",
                 va="center",
@@ -781,10 +792,14 @@ def performance_gap_plot(
                 xytext=(8, 0) if performance_id > performance_ood else (-10, 0),
                 textcoords="offset points",
             )
+    if row_count > 1:
+        original_margin = (row_count - 1) * 0.05
+        ax_main.set_ylim(-original_margin, row_count - 1 + original_margin)
     ax_main.axis("off")
 
-    for dataname, ax_pca, ax_mahalanobis, color in zip(
+    for dataname, query_type, ax_pca, ax_mahalanobis, color in zip(
         [id_dataset, ood_dataset],
+        ["In-distribution queries", "Out-of-distribution queries"],
         [ax_pca_id, ax_pca_ood],
         [ax_mahalanobis_id, ax_mahalanobis_ood],
         ["tab:green", "tab:purple"],
@@ -798,15 +813,52 @@ def performance_gap_plot(
         pdata = pca_mahalanobis_data.filter(pl.col("dataset") == dataname, pl.col("part") == "test")
         ax_pca.scatter(pdata["x"], pdata["y"], s=0.1, c=color)
         sns.kdeplot(pdata, x="mahalanobis_distance_to_data", color=color, fill=True, legend=False, ax=ax_mahalanobis)
-        ax_pca.axis("off")
+        ax_pca.set_xlabel("PC 1", fontsize=7)
+        ax_pca.set_ylabel("PC 2", fontsize=7)
+        ax_pca.set_title(query_type, color=color, fontsize=9)
+        ax_pca.set_xticks([])
+        ax_pca.set_yticks([])
+        ax_pca.spines[:].set_visible(False)
         ax_mahalanobis.set_yticks([])
-        ax_mahalanobis.set_xticks([])
-        ax_mahalanobis.set_xlabel("")
-        ax_mahalanobis.set_ylabel("")
+        ax_mahalanobis.set_xlabel("Mahalanobis distance", fontsize=7)
+        ax_mahalanobis.set_ylabel("Density", fontsize=7)
+        ax_mahalanobis.set_title(query_type, color=color, fontsize=9)
+        ax_mahalanobis.tick_params(axis="x", labelsize=6)
         ax_mahalanobis.spines[:].set_visible(False)
         ax_mahalanobis.spines["bottom"].set_visible(True)
 
     plt.tight_layout()
+    pca_height_expansion = 0.05
+    top_pca_position = ax_pca_id.get_position()
+    ax_pca_id.set_position(
+        [
+            top_pca_position.x0,
+            top_pca_position.y0 - pca_height_expansion,
+            top_pca_position.width,
+            top_pca_position.height + pca_height_expansion,
+        ]
+    )
+    bottom_pca_position = ax_pca_ood.get_position()
+    ax_pca_ood.set_position(
+        [
+            bottom_pca_position.x0,
+            bottom_pca_position.y0 - pca_height_expansion,
+            bottom_pca_position.width,
+            bottom_pca_position.height + pca_height_expansion,
+        ]
+    )
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    distribution_bounds = mpl.transforms.Bbox.union(
+        [
+            ax.get_tightbbox(renderer)
+            for ax in [ax_pca_id, ax_pca_ood, ax_mahalanobis_id, ax_mahalanobis_ood]
+        ]
+    ).transformed(fig.transFigure.inverted())
+    main_position = ax_main.get_position()
+    ax_main.set_position(
+        [main_position.x0, distribution_bounds.y0, main_position.width, distribution_bounds.height]
+    )
     filename = f"performance-gap-{ood_dataset}{gpu_suffix}.png"
     print("Writing", out_dir / filename)
     plt.savefig(out_dir / filename, dpi=300)
@@ -871,7 +923,7 @@ def paper(out_dir, all_algorithms, summary, detail, query_stats, pca_mahalanobis
         )
 
     for datasets in [
-        ["hotpotqa-harrier-640-normalized", "imagenet-align-640-normalized"],
+        ["hotpotqa-harrier-640-normalized", "yandex-200-cosine"],
         ["laion-clip-512-normalized", "yandex-200-cosine"],
     ]:
         pareto_plot(
