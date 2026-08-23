@@ -7,7 +7,7 @@
 
 <div align="center">
     <a href="https://vector-index-bench.github.io"><img src="https://img.shields.io/badge/Results-Website-blue" alt="Website" /></a>
-    <a href="https://arxiv.org/pdf/2505.17810"><img src="https://img.shields.io/badge/Paper-arXiv%3A_VIBE-salmon" alt="Paper" /></a>
+    <a href="https://openreview.net/forum?id=6Sx6ra1QLz"><img src="https://img.shields.io/badge/Paper-DMLR%3A_VIBE-salmon" alt="Paper" /></a>
     <a href="https://github.com/vector-index-bench/vibe/blob/master/LICENSE"><img src="https://img.shields.io/github/license/vector-index-bench/vibe" alt="License" /></a>
     <a href="https://github.com/vector-index-bench/vibe/stargazers"><img src="https://img.shields.io/github/stars/vector-index-bench/vibe" alt="GitHub stars" /></a>
 </div>
@@ -31,7 +31,7 @@ The website also features several other tools and visualizations to explore the 
 The results are run on Intel Xeon Gold 6230 (Cascade Lake) CPUs with support for AVX-512 instructions. All algorithms are benchmarked using a single core. The GPU algorithms are run using an NVIDIA V100 (32 GB). The next results update will use AMD Turin 9965 CPUs, while GPU algorithms will be run using NVIDIA GH200 (96 GB).
 
 ### Publication
-E. Jääsaari, V. Hyvönen, M. Ceccarello, T. Roos, M. Aumüller. [VIBE: Vector Index Benchmark for Embeddings](https://arxiv.org/pdf/2505.17810). _arXiv preprint arXiv:2505.17810_, 2025.
+E. Jääsaari, V. Hyvönen, M. Ceccarello, T. Roos, M. Aumüller. [VIBE: Vector Index Benchmark for Embeddings](https://openreview.net/forum?id=6Sx6ra1QLz). Journal of Data-centric Machine Learning Research, 2026.
 
 ### Authors
 VIBE is maintained by [Elias Jääsaari](https://github.com/ejaasaari), [Matteo Ceccarello](https://github.com/Cecca), and [Martin Aumüller](https://github.com/maumueller).
