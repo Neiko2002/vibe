@@ -32,28 +32,38 @@ def main():
         if g["R"] == 48 and g["quant"] == "SQ8U" and g["search_quant"] == "SQ8U" and g["refine_quant"] == "FP16"
     ]
 
+    # ALLE Runs lückenlos von Run 0 bis Run 7:
     runs = {
         "glass": (get_pareto_frontier(glass_r48), {
-            "color": "#D90429", "label": "Glass Referenz (HNSW R=48, SQ8U->FP16)", "marker": "o", "lw": 2.8, "ms": 7, "zorder": 10
+            "color": "#D90429", "label": "Glass Referenz (HNSW R=48, SQ8U->FP16)", "marker": "o", "lw": 3.0, "ms": 7, "zorder": 12
         }),
-        "base": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_baseline_eps_top100.json")), {
-            "color": "#CED4DA", "label": "DEG-QG Baseline (eps-Radius, K=48)", "marker": "x", "lw": 1.4, "ms": 4, "ls": ":", "zorder": 2
+        "r0": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_baseline_eps_top100.json")), {
+            "color": "#ADB5BD", "label": "Run 0: Baseline (eps-Radius, K=48)", "marker": "x", "lw": 1.4, "ms": 5, "ls": ":", "zorder": 2
         }),
         "r1": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_linear_pool.json")), {
-            "color": "#ADB5BD", "label": "Run 1: LinearPool ef", "marker": "^", "lw": 1.5, "ms": 5, "ls": "--", "zorder": 3
+            "color": "#8D99AE", "label": "Run 1: LinearPool ef", "marker": "+", "lw": 1.5, "ms": 6, "ls": "--", "zorder": 3
+        }),
+        "r2": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run2.json")), {
+            "color": "#4A90E2", "label": "Run 2: 64 Medoids + Edge Prefetch", "marker": "v", "lw": 1.7, "ms": 5, "ls": "-.", "zorder": 4
+        }),
+        "r3": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run3.json")), {
+            "color": "#00B4D8", "label": "Run 3: Auto Prefetch (po=14, pl=4)", "marker": "^", "lw": 1.8, "ms": 5, "ls": "-.", "zorder": 5
         }),
         "r4": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run4.json")), {
-            "color": "#457B9D", "label": "Run 4: 128 KM Medoids + Top-2 Entry", "marker": "P", "lw": 1.8, "ms": 6, "ls": "-.", "zorder": 5
+            "color": "#0077B6", "label": "Run 4: 128 KM Medoids + Top-2 Entry", "marker": "s", "lw": 2.0, "ms": 6, "zorder": 6
+        }),
+        "r5": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run5.json")), {
+            "color": "#52B788", "label": "Run 5: Unrolled AVX-512 VNNI D=200", "marker": "p", "lw": 2.2, "ms": 6, "zorder": 7
         }),
         "r6": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run6.json")), {
-            "color": "#52B788", "label": "Run 6: Unrolled SIMD + 4CL Prefetch", "marker": "s", "lw": 2.2, "ms": 6, "zorder": 7
+            "color": "#2D6A4F", "label": "Run 6: Vector Tail + 4CL Prefetch (Fine Grid)", "marker": "h", "lw": 2.5, "ms": 7, "zorder": 8
         }),
         "r7": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run7.json") + load_run("results/yandex-200-cosine/deg_qg_summary_top100_run6.json")), {
-            "color": "#081C15", "label": "Run 7: Contiguous 256B Aligned + Adaptiv Rerank (Final)", "marker": "D", "lw": 3.2, "ms": 8, "zorder": 9
+            "color": "#081C15", "label": "Run 7: Contiguous 256B Aligned + Adaptiv Rerank", "marker": "D", "lw": 3.2, "ms": 8, "zorder": 11
         }),
     }
 
-    fig, ax = plt.subplots(figsize=(11.5, 8), dpi=300)
+    fig, ax = plt.subplots(figsize=(13, 8.5), dpi=300)
 
     for run_key, (pareto, style) in runs.items():
         px = [p["recall"] for p in pareto if p["recall"] >= 0.88]
@@ -64,7 +74,7 @@ def main():
     ax.set_ylim(0, 14500)
     ax.set_xlabel("Recall@100", fontsize=13, fontweight="bold")
     ax.set_ylabel("QPS (Queries / Sekunde)", fontsize=13, fontweight="bold")
-    ax.set_title("Vollständige AutoResearch Evolution: DEG-QG (Runs 0–7) übertrifft Glass auf yandex-200-cosine",
+    ax.set_title("Vollständige AutoResearch Evolution: ALLE Runs (0 bis 7) vs. Glass auf yandex-200-cosine",
                  fontsize=14, fontweight="bold", pad=15)
     ax.grid(True, which="both", ls=":", alpha=0.6)
     ax.legend(loc="upper right", fontsize=10, framealpha=0.95)
