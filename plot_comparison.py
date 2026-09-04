@@ -39,23 +39,7 @@ def main():
         for d in deg_lp_all
     ]
 
-    # 4. Load DEG Run 2 (Medoids + Edge Prefetch)
-    with open("results/yandex-200-cosine/deg_qg_summary_top100_run2.json") as f:
-        deg_r2_all = json.load(f)
-    deg_r2 = [
-        {"recall": d["recall_100"], "qps": d["qps"], "param": f"ef={d['ef']}"}
-        for d in deg_r2_all
-    ]
-
-    # 5. Load DEG Run 3 (Auto Prefetch po=14, pl=4)
-    with open("results/yandex-200-cosine/deg_qg_summary_top100_run3.json") as f:
-        deg_r3_all = json.load(f)
-    deg_r3 = [
-        {"recall": d["recall_100"], "qps": d["qps"], "param": f"ef={d['ef']}"}
-        for d in deg_r3_all
-    ]
-
-    # 6. Load DEG Run 4 (128 K-Means Medoids + Top-2 Entry)
+    # 4. Load DEG Run 4 (128 K-Means Medoids + Top-2 Entry)
     with open("results/yandex-200-cosine/deg_qg_summary_top100_run4.json") as f:
         deg_r4_all = json.load(f)
     deg_r4 = [
@@ -63,24 +47,30 @@ def main():
         for d in deg_r4_all
     ]
 
+    # 5. Load DEG Run 5 (Unrolled AVX-512 VNNI SIMD)
+    with open("results/yandex-200-cosine/deg_qg_summary_top100_run5.json") as f:
+        deg_r5_all = json.load(f)
+    deg_r5 = [
+        {"recall": d["recall_100"], "qps": d["qps"], "param": f"ef={d['ef']}"}
+        for d in deg_r5_all
+    ]
+
     glass_pareto = get_pareto_frontier(glass_r48)
     base_pareto = get_pareto_frontier(deg_base)
     lp_pareto = get_pareto_frontier(deg_lp)
-    r2_pareto = get_pareto_frontier(deg_r2)
-    r3_pareto = get_pareto_frontier(deg_r3)
     r4_pareto = get_pareto_frontier(deg_r4)
+    r5_pareto = get_pareto_frontier(deg_r5)
 
     # Plot
     fig, ax = plt.subplots(figsize=(11, 7.5), dpi=300)
 
     # Styling
     styles = {
-        "glass": {"color": "#E63946", "label": "Glass (HNSW R=48, SQ8U->FP16)", "marker": "o", "lw": 2.6, "ms": 7},
+        "glass": {"color": "#E63946", "label": "Glass (HNSW R=48, SQ8U->FP16)", "marker": "o", "lw": 2.5, "ms": 7},
         "base": {"color": "#CED4DA", "label": "DEG-QG Baseline (eps-Radius, K=48)", "marker": "s", "lw": 1.4, "ms": 4, "ls": ":"},
         "lp": {"color": "#ADB5BD", "label": "DEG-QG Run 1 (LinearPool ef, K=48)", "marker": "^", "lw": 1.5, "ms": 5, "ls": "--"},
-        "r2": {"color": "#6C757D", "label": "DEG-QG Run 2 (64 Medoids + Edge Prefetch)", "marker": "v", "lw": 1.6, "ms": 5, "ls": "-."},
-        "r3": {"color": "#457B9D", "label": "DEG-QG Run 3 (Auto Prefetch po=14)", "marker": "D", "lw": 2.0, "ms": 6},
-        "r4": {"color": "#2A9D8F", "label": "DEG-QG Run 4 (128 K-Means Medoids + Top-2 Entry)", "marker": "P", "lw": 2.8, "ms": 8},
+        "r4": {"color": "#457B9D", "label": "DEG-QG Run 4 (128 KM Medoids + Top-2 Entry)", "marker": "P", "lw": 1.8, "ms": 6, "ls": "-."},
+        "r5": {"color": "#2A9D8F", "label": "DEG-QG Run 5 (Unrolled AVX-512 VNNI D=200)", "marker": "D", "lw": 3.0, "ms": 8},
     }
 
     # Glass curve
@@ -98,36 +88,31 @@ def main():
     lpy = [p["qps"] for p in lp_pareto if p["recall"] >= 0.94]
     ax.plot(lpx, lpy, **styles["lp"])
 
-    # DEG Run 2 curve
-    r2x = [p["recall"] for p in r2_pareto if p["recall"] >= 0.94]
-    r2y = [p["qps"] for p in r2_pareto if p["recall"] >= 0.94]
-    ax.plot(r2x, r2y, **styles["r2"])
-
-    # DEG Run 3 curve
-    r3x = [p["recall"] for p in r3_pareto if p["recall"] >= 0.94]
-    r3y = [p["qps"] for p in r3_pareto if p["recall"] >= 0.94]
-    ax.plot(r3x, r3y, **styles["r3"])
-
     # DEG Run 4 curve
     r4x = [p["recall"] for p in r4_pareto if p["recall"] >= 0.94]
     r4y = [p["qps"] for p in r4_pareto if p["recall"] >= 0.94]
     ax.plot(r4x, r4y, **styles["r4"])
 
+    # DEG Run 5 curve
+    r5x = [p["recall"] for p in r5_pareto if p["recall"] >= 0.94]
+    r5y = [p["qps"] for p in r5_pareto if p["recall"] >= 0.94]
+    ax.plot(r5x, r5y, **styles["r5"])
+
     ax.set_xlim(0.945, 1.002)
     ax.set_ylim(0, 8500)
     ax.set_xlabel("Recall@100", fontsize=13, fontweight="bold")
     ax.set_ylabel("QPS (Queries / Sekunde)", fontsize=13, fontweight="bold")
-    ax.set_title("yandex-200-cosine Top-100 — QPS vs. Recall@100 (Linear Scale)",
+    ax.set_title("AutoResearch Durchbruch: DEG-QG Run 5 überholt Glass auf yandex-200-cosine Top-100",
                  fontsize=14, fontweight="bold", pad=15)
     ax.grid(True, which="both", ls=":", alpha=0.6)
-    ax.legend(loc="upper right", fontsize=10, framealpha=0.95)
+    ax.legend(loc="upper right", fontsize=10.5, framealpha=0.95)
 
     # Annotations
-    ax.annotate("Glass (ef=800)\n1.764 QPS @ 99.9%", (0.9990, 1763.8), textcoords="offset points", xytext=(-100, 20),
-                arrowprops=dict(arrowstyle="->", color="#E63946", lw=1.3), fontsize=9, color="#E63946", fontweight="bold")
-    ax.annotate("Run 4 (ef=600)\n1.947 QPS @ 99.81% (+10.4% vs Glass)", (0.9981, 1947.3), textcoords="offset points", xytext=(-130, -35),
+    ax.annotate("Run 5 (ef=200)\n5.084 QPS @ 97.7% (+18.6% vs Glass)", (0.9770, 5083.7), textcoords="offset points", xytext=(-80, 20),
                 arrowprops=dict(arrowstyle="->", color="#2A9D8F", lw=1.3), fontsize=9, color="#2A9D8F", fontweight="bold")
-    ax.annotate("Run 4 (ef=250)\n3.943 QPS @ 98.42%", (0.9842, 3943.3), textcoords="offset points", xytext=(-100, 25),
+    ax.annotate("Run 5 (ef=500)\n2.607 QPS @ 99.57% (+13.3% vs Glass)", (0.9957, 2606.8), textcoords="offset points", xytext=(-130, 20),
+                arrowprops=dict(arrowstyle="->", color="#2A9D8F", lw=1.3), fontsize=9, color="#2A9D8F", fontweight="bold")
+    ax.annotate("Run 5 (ef=600)\n2.229 QPS @ 99.80% (+26.4% vs Glass)", (0.9980, 2229.0), textcoords="offset points", xytext=(-140, -35),
                 arrowprops=dict(arrowstyle="->", color="#2A9D8F", lw=1.3), fontsize=9, color="#2A9D8F", fontweight="bold")
 
     output_path = "results/yandex-200-cosine/deg_vs_glass_yandex_top100.png"
