@@ -9,8 +9,11 @@ plots/*
 *.log
 *.sif
 
-results/*
-!results/*.png
+results/**
+!results/**/
+!results/**/*.png
+!results/**/*.json
+!results/**/*.md
 *.parquet
 plots/*.png
 

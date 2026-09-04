@@ -59,7 +59,10 @@ def main():
             "color": "#2D6A4F", "label": "Run 6: Vector Tail + 4CL Prefetch (Fine Grid)", "marker": "h", "lw": 2.5, "ms": 7, "zorder": 8
         }),
         "r7": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run7.json") + load_run("results/yandex-200-cosine/deg_qg_summary_top100_run6.json")), {
-            "color": "#081C15", "label": "Run 7: Contiguous 256B Aligned + Adaptiv Rerank", "marker": "D", "lw": 3.2, "ms": 8, "zorder": 11
+            "color": "#081C15", "label": "Run 7: Contiguous 256B Aligned + Adaptiv Rerank", "marker": "D", "lw": 2.2, "ms": 6, "ls": "--", "zorder": 10
+        }),
+        "phase2": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_phase2.json")), {
+            "color": "#7209B7", "label": "Phase 2 Final: Contiguous Edges + SIMD Medoids + Fine ef", "marker": "*", "lw": 3.6, "ms": 9, "zorder": 15
         }),
     }
 
@@ -74,7 +77,7 @@ def main():
     ax.set_ylim(0, 14500)
     ax.set_xlabel("Recall@100", fontsize=13, fontweight="bold")
     ax.set_ylabel("QPS (Queries / Sekunde)", fontsize=13, fontweight="bold")
-    ax.set_title("Vollständige AutoResearch Evolution: ALLE Runs (0 bis 7) vs. Glass auf yandex-200-cosine",
+    ax.set_title("Vollständige AutoResearch Evolution: ALLE Runs (0 bis Phase 2) vs. Glass auf yandex-200-cosine (Single-Core)",
                  fontsize=14, fontweight="bold", pad=15)
     ax.grid(True, which="both", ls=":", alpha=0.6)
     ax.legend(loc="upper right", fontsize=10, framealpha=0.95)
@@ -92,6 +95,8 @@ def main():
                 arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.3), fontsize=9, color="#D90429", fontweight="bold")
     ax.annotate("Run 6 (1.1x, ef=600)\n2.266 QPS @ 99.80% (+28.4% vs Glass)", (0.9980, 2265.5), textcoords="offset points", xytext=(-140, -35),
                 arrowprops=dict(arrowstyle="->", color="#081C15", lw=1.3), fontsize=9, color="#081C15", fontweight="bold")
+    ax.annotate("Phase 2 Final (1.35x, ef=850)\n1.620 QPS @ 99.90% (Glass: 1.764 QPS)", (0.9990, 1620.1), textcoords="offset points", xytext=(-160, 25),
+                arrowprops=dict(arrowstyle="->", color="#7209B7", lw=1.5), fontsize=9, color="#7209B7", fontweight="bold")
 
     output_path = "results/yandex-200-cosine/deg_vs_glass_yandex_top100.png"
     plt.savefig(output_path, bbox_inches="tight")
