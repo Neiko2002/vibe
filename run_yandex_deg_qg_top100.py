@@ -31,7 +31,7 @@ def run_benchmark():
     print(f"Found {len(defs)} parameter configurations for DEG-QG ({len(defs[0].query_argument_groups)} queries each).", flush=True)
 
     summary_records = []
-    summary_file = Path("results") / dataset_name / "deg_qg_summary_top100_run6.json"
+    summary_file = Path("results") / dataset_name / "deg_qg_summary_top100_run7.json"
     summary_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Load Ground Truth distances for official VIBE Recall@100 computation
@@ -121,7 +121,7 @@ def run_benchmark():
 
     # Generate Markdown Report
     from generate_report import generate_markdown_report
-    generate_markdown_report(f"{dataset_name}-DEG-QG-RUN6", summary_records, Path("results") / dataset_name / "DEG_QG_RUN6_YANDEX_TOP100_RESULTS.md")
+    generate_markdown_report(f"{dataset_name}-DEG-QG-RUN7", summary_records, Path("results") / dataset_name / "DEG_QG_RUN7_YANDEX_TOP100_RESULTS.md")
 
 
 if __name__ == "__main__":
