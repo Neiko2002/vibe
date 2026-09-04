@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from pathlib import Path
 import deglib
 
@@ -11,6 +12,26 @@ _METRIC_MAP = {
     "ip": (deglib.Metric.FP32_InnerProduct, deglib.Metric.Int8_InnerProduct, deglib.Metric.FP16_InnerProduct),
     "normalized": (deglib.Metric.FP32_InnerProduct, deglib.Metric.Int8_InnerProduct, deglib.Metric.FP16_InnerProduct),
 }
+
+def find_kmeans_medoids(X: np.ndarray, n_clusters: int = 128, n_iter: int = 15, sample_size: int = 30000) -> np.ndarray:
+    rng = np.random.default_rng(42)
+    sample_indices = rng.choice(len(X), size=min(sample_size, len(X)), replace=False)
+    sub_X = X[sample_indices]
+    n_clusters = min(n_clusters, len(sub_X))
+    init_idx = rng.choice(len(sub_X), size=n_clusters, replace=False)
+    centroids = sub_X[init_idx].copy()
+    for _ in range(n_iter):
+        sims = np.dot(sub_X, centroids.T)
+        labels = np.argmax(sims, axis=1)
+        for c in range(n_clusters):
+            members = sub_X[labels == c]
+            if len(members) > 0:
+                mean_vec = np.mean(members, axis=0)
+                norm = np.linalg.norm(mean_vec)
+                if norm > 1e-6:
+                    centroids[c] = mean_vec / norm
+    medoids = [sample_indices[np.argmax(np.dot(sub_X, centroids[c]))] for c in range(n_clusters)]
+    return np.array(medoids, dtype=np.uint32)
 
 
 class DEG(BaseANN):
@@ -167,10 +188,10 @@ class QG(BaseANN):
         int8_features = self.quantizer.quantize(X, num_threads=1)
         target_space = deglib.FloatSpace.create(dim=dims, metric=self.int8_metric)
         self.graph = loaded_graph.to_readonly(target_space, int8_features)
-        # Set 64 well-spaced entrypoints across the graph to reduce cluster navigation hops
-        rng = np.random.default_rng(42)
-        n_entries = min(64, len(X))
-        entry_indices = rng.choice(len(X), size=n_entries, replace=False).astype(np.uint32)
+        # Set 128 K-Means cluster medoids across the graph to reduce cluster navigation hops
+        t_km = time.time()
+        entry_indices = find_kmeans_medoids(X, n_clusters=128, n_iter=15, sample_size=30000)
+        print(f"K-Means 128 cluster medoids computed in {time.time() - t_km:.2f}s", flush=True)
         self.graph.set_entry_vertex_indices(entry_indices)
 
         # 5. Initialize C++ Zero-overhead Searcher
@@ -180,6 +201,17 @@ class QG(BaseANN):
             refine_space=self.rerank_space_fp16,
             refine_data=self.original_features_fp16,
         )
+
+        # 6. Auto-tune prefetch parameters (po, pl) using 100 sample queries
+        sample_queries = X[:100]
+        best_po, best_pl = self.searcher.optimize(
+            sample_queries,
+            k=100,
+            ef=200,
+            try_pos=[4, 6, 8, 10, 12, 14, 16],
+            try_pls=[2, 3, 4],
+        )
+        print(f"Prefetch auto-tuner selected: best_po={best_po}, best_pl={best_pl}", flush=True)
 
     def set_query_arguments(self, *args, **kwargs):
         """Sets query-time parameters: supports (rerank_factor, search_eps) or (rerank_factor, ef)."""
