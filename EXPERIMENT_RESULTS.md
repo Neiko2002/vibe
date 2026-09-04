@@ -17,32 +17,34 @@ Dieses Dokument erfasst alle durchgeführten Experimente, Messergebnisse, Code-�
 
 ## 2. Zusammenfassung aller Experiment-Runs
 
-| Run ID | Datum | Bezeichnung | Beschreibung | Recall@98% QPS | Recall@99% QPS | Recall@99.5% QPS | Status |
+| Run ID | Datum | Git Tag (deglib / vibe) | Beschreibung | Recall@98% QPS | Recall@99% QPS | Recall@99.5% QPS | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Ref** | 2026-09-04 | **Glass Benchmark** | Zilliz Glass HNSW $R=48, L=400, SQ8U \rightarrow FP16$ | **4.288** | **3.320** | **2.300** | **Benchmark-Ziel** |
-| **Run 0** | 2026-09-04 | **DEG-QG Baseline** | Originaler DEG $\epsilon$-Suchradius ($K=48$, LowLID, No-Prune) | 2.876 | 2.180 | 1.855 | **Baseline gesetzt** |
-| **Run 1** | 2026-09-04 | **LinearPool Engine** | Portierung von Glass `LinearPool` ($ef$-Budget) + `SearchImpl2` | 3.081 (+7.1%) | 2.192 (+0.6%) | 1.871 (+0.9%) | **Behalten** |
-| **Run 2** | 2026-09-04 | **Medoids + Prefetch**| 64 Einstiegspunkte + Prefetch der Nachbarlisten bei Insert | **3.881 (+34.9%)** | **2.702 (+24.0%)** | **2.250 (+21.3%)** | **Großer Sprung** |
+| **Ref** | 2026-09-04 | `glass` container | Zilliz Glass HNSW $R=48, L=400, SQ8U \rightarrow FP16$ | **4.288** | **3.320** | **2.300** | **Benchmark-Ziel** |
+| **Run 0** | 2026-09-04 | `run-0-baseline` (`47f8c24`) | Originaler DEG $\epsilon$-Suchradius ($K=48$, LowLID, No-Prune) | 2.876 | 2.180 | 1.855 | **Baseline gesetzt** |
+| **Run 1** | 2026-09-04 | `run-1` (Zwischenschritt) | Portierung von Glass `LinearPool` ($ef$-Budget) + `SearchImpl2` | 3.081 (+7.1%) | 2.192 (+0.6%) | 1.871 (+0.9%) | **Behalten** |
+| **Run 2** | 2026-09-04 | `run-2-medoids-prefetch` (`d47d4b1`) | 64 Einstiegspunkte + Prefetch der Nachbarlisten bei Insert | **3.881 (+34.9%)** | **2.702 (+24.0%)** | **2.250 (+21.3%)** | **Großer Sprung** |
 
 ## 2.1 Visuelle Pareto-Kurve (QPS vs. Recall@100)
 
 ![DEG-QG vs Glass](results/yandex-200-cosine/deg_vs_glass_yandex_top100.png)
 
-* **Rote Kurve (Glass Referenz)**: $R=48, L=400$, SQ8U $\rightarrow$ FP16. Führt weiterhin um ca. 25–35%.
-* **Blaue gestrichelte Kurve (DEG Baseline Run 0)**: Originale $\epsilon$-Suche. Fällt bei $> 99.8\%$ steil wie eine Klippe ab (bis auf 80–248 QPS), da $\epsilon \ge 0.15$ die Queue flutet.
-* **Grüne Kurve (DEG Phase 1 LinearPool Run 1)**: Vollständige Glättung der Kurve, **+7% bis +14% QPS** über weite Teile des High-Recall-Bereichs.
+* **Rote Kurve (Glass Referenz)**: $R=48, L=400$, SQ8U $\rightarrow$ FP16. Führt noch bei 99.0% und 99.9%.
+* **Graue gestrichelte Kurve (DEG Baseline Run 0)**: Originale $\epsilon$-Suche. Fällt bei $> 99.8\%$ steil wie eine Klippe ab (bis auf 80–248 QPS).
+* **Blaue Kurve (DEG Run 1 LinearPool)**: Stabilisierung des Verlaufs durch $ef$-Begrenzung.
+* **Grüne Rauten-Kurve (DEG Run 2 Medoids + Prefetch)**: Großer Schub nach oben (+20% bis +37% vs Baseline). Überholt Glass bei 97.0% und 98.5%, schließt bei 99.5% auf -2.2% auf.
 
 ---
+
 ## 3. Detaillierte Run-Protokolle
 
 ### Run 0: Die verifizierte Host-Baseline (DEG-QG Original)
 
+* **Git Commit**: `47f8c244` (Tag: `run-0-baseline`) in `DynamicExplorationGraph`
 * **Report-Datei**: `results/yandex-200-cosine/DEG_QG_BASELINE_EPS_YANDEX_TOP100_RESULTS.md`
 * **Rohdaten**: `results/yandex-200-cosine/deg_qg_baseline_eps_top100.json`
 * **Implementierung**: Originaler `searchImpl`-Pfad in `internal_graph.h` mit Priority Queue (`UncheckedSet`) und Abbruchkriterium:
   $$\text{exploration\_radius} = \text{radius}_{k} \times (1 + \epsilon)$$
 * **Index-Bau**: 381.12 s, Speicher: 835.3 MB
-
 #### Messwerte Run 0:
 
 | `rerank` | `search_eps` | Recall@100 | QPS (Single-Core) | Latency / Query |
@@ -103,11 +105,10 @@ Dieses Dokument erfasst alle durchgeführten Experimente, Messergebnisse, Code-�
 
 ### Run 2: 64 Medoid-Einstiegspunkte + Kantenlisten-Prefetching bei Pool-Insert
 
+* **Git Commit**: `d47d4b1` (Tag: `run-2-medoids-prefetch`) in `DynamicExplorationGraph`, `5dfac3e` (Tag: `run-2-vibe`) in `vibe`
 * **Report-Datei**: `results/yandex-200-cosine/DEG_QG_RUN2_YANDEX_TOP100_RESULTS.md`
 * **Rohdaten**: `results/yandex-200-cosine/deg_qg_summary_top100_run2.json`
 * **Code-Änderungen**:
-  1. `vibe/algorithms/deg/module.py`: 64 gut verteilte Medoid-Einstiegspunkte werden beim Indexieren gesetzt (`self.graph.set_entry_vertex_indices(...)`).
-  2. `cpp/deglib/include/deglib/graph/internal_graph.h`: Vor der Suche wird unter den 64 Einstiegspunkten der mit der geringsten Distanz zur Query ermittelt.
   3. Sobald ein Nachbar $v$ erfolgreich in den `LinearPool` eingefügt wird (`pool.insert`), wird dessen Kantenliste vorab in den Cache geholt (`memory::prefetch(neighbors_by_index(v))`), analog zu Glass.
 
 #### Messwerte Run 2:
