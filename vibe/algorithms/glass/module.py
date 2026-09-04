@@ -14,6 +14,7 @@ class Glass(BaseANN):
         self.quant = quant
         self.search_quant = search_quant
         self.refine_quant = refine_quant
+        self.ef = 0
 
     def fit(self, X):
         if self.metric == "cosine":
