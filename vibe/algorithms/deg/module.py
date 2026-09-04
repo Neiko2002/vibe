@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 import deglib
 
 from ..base.module import BaseANN
@@ -131,33 +132,46 @@ class QG(BaseANN):
         self.original_features_fp16 = deglib.distances.floats_to_fp16(X)
         self.rerank_space_fp16 = deglib.FloatSpace.create(dim=dims, metric=self.fp16_metric)
 
-        # 1. FLAS 1D Pre-sorting
-        sorted_indices = deglib.optimization.presort(
-            X,
-            metric=self.base_metric,
-            threads=1,
-        )
+        cache_file = Path(f"data/cache_deg_{self.metric}_k{self.k}_{self.opt_target}_n{len(X)}.deg")
+        if cache_file.exists():
+            print(f"Loading cached DEG graph from {cache_file}...", flush=True)
+            loaded_graph = deglib.load_readonly_graph(str(cache_file))
+        else:
+            # 1. FLAS 1D Pre-sorting
+            sorted_indices = deglib.optimization.presort(
+                X,
+                metric=self.base_metric,
+                threads=1,
+            )
 
-        # 2. Build graph in FP32
-        graph = deglib.builder.build_from_data(
-            data=X[sorted_indices],
-            labels=sorted_indices,
-            edges_per_vertex=self.k,
-            metric=self.base_metric,
-            seed=7,
-            optimization_target=self.opt_enum,
-            thread_count=1,
-        )
+            # 2. Build graph in FP32
+            graph = deglib.builder.build_from_data(
+                data=X[sorted_indices],
+                labels=sorted_indices,
+                edges_per_vertex=self.k,
+                metric=self.base_metric,
+                seed=7,
+                optimization_target=self.opt_enum,
+                thread_count=1,
+            )
 
-        # 3. Optional MRNG edge pruning
-        if self.prune_non_rng:
-            deglib.optimization.prune_non_rng_edges(graph, num_threads=1)
+            # 3. Optional MRNG edge pruning
+            if self.prune_non_rng:
+                deglib.optimization.prune_non_rng_edges(graph, num_threads=1)
 
+            print(f"Saving graph to cache {cache_file}...", flush=True)
+            graph.save_graph(str(cache_file))
+            loaded_graph = graph
         # 4. Finalize ReadOnlyGraph with INT8 features using calibrated ScalarQuantizer
         self.quantizer = deglib.optimization.make_scalar_quantizer_int8(X)
         int8_features = self.quantizer.quantize(X, num_threads=1)
         target_space = deglib.FloatSpace.create(dim=dims, metric=self.int8_metric)
-        self.graph = graph.to_readonly(target_space, int8_features)
+        self.graph = loaded_graph.to_readonly(target_space, int8_features)
+        # Set 64 well-spaced entrypoints across the graph to reduce cluster navigation hops
+        rng = np.random.default_rng(42)
+        n_entries = min(64, len(X))
+        entry_indices = rng.choice(len(X), size=n_entries, replace=False).astype(np.uint32)
+        self.graph.set_entry_vertex_indices(entry_indices)
 
         # 5. Initialize C++ Zero-overhead Searcher
         self.searcher = deglib.search.create_searcher(
@@ -167,10 +181,31 @@ class QG(BaseANN):
             refine_data=self.original_features_fp16,
         )
 
-    def set_query_arguments(self, rerank_size_factor: float = 1.0, search_eps: float = 0.1):
-        """Sets query-time rerank scaling factor and search_eps (in YAML order)."""
-        self.rerank_size_factor = float(rerank_size_factor)
-        self.search_eps = float(search_eps)
+    def set_query_arguments(self, *args, **kwargs):
+        """Sets query-time parameters: supports (rerank_factor, search_eps) or (rerank_factor, ef)."""
+        self.rerank_size_factor = float(kwargs.get("rerank_size_factor", 1.0))
+        self.search_eps = float(kwargs.get("search_eps", 0.0))
+        self.ef = int(kwargs.get("ef", 0))
+
+        if len(args) == 1:
+            val = args[0]
+            if isinstance(val, int) or (isinstance(val, float) and val >= 1.0 and val.is_integer()):
+                self.ef = int(val)
+            else:
+                self.search_eps = float(val)
+        elif len(args) == 2:
+            self.rerank_size_factor = float(args[0])
+            val = args[1]
+            if isinstance(val, int) or (isinstance(val, float) and val >= 1.0 and val.is_integer()):
+                self.ef = int(val)
+                self.search_eps = 0.0
+            else:
+                self.search_eps = float(val)
+                self.ef = 0
+        elif len(args) >= 3:
+            self.rerank_size_factor = float(args[0])
+            self.search_eps = float(args[1])
+            self.ef = int(args[2])
 
     def query(self, v: np.ndarray, n: int) -> np.ndarray:
         """Single query search on 1 thread with INT8 search and FP16 reranking directly in C++."""
@@ -184,9 +219,15 @@ class QG(BaseANN):
             threads=1,
             return_distances=False,
             unsorted=True,
+            ef=self.ef,
         )
 
     def __str__(self) -> str:
+        if getattr(self, "ef", 0) > 0:
+            return (
+                f"DEG-QG(k={self.k}, opt={self.opt_target}, prune_rng={self.prune_non_rng}, "
+                f"rerank_factor={self.rerank_size_factor}, ef={self.ef})"
+            )
         return (
             f"DEG-QG(k={self.k}, opt={self.opt_target}, prune_rng={self.prune_non_rng}, "
             f"rerank_factor={self.rerank_size_factor}, eps={self.search_eps})"

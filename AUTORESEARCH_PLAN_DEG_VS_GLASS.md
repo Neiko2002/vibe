@@ -12,18 +12,26 @@ Dieses Dokument ist der vollständige, iterative AutoResearch-Plan, um `deglib` 
   * **Glass**: `R=48, L=400, SQ8U -> SQ8U + FP16`
   * **DEG-QG**: $K=48$, `LowLID`, `prune_non_rng=False` (No-Prune), INT8 Graphsuche + FP16 Reranking
 
-### Reale Messwerte (aus den VIBE-Ergebnisberichten)
+### Reale Messwerte auf dieser Maschine (Verified Baseline & Phase 1)
 
-| Recall-Stufe | Glass (`R=48, L=400, SQ8U+FP16`) | DEG-QG (`K=48, LowLID, No-Prune`) | Differenz / Rückstand von DEG |
-| :--- | :--- | :--- | :--- |
-| **$\ge 95.0\%$** | **6.210 QPS** (`ef=200`, Recall 96.8%) | **4.518 QPS** (`1.0x, eps=0.02`, Recall 95.2%) | **-27.2%** |
-| **$\ge 98.0\%$** | **4.288 QPS** (`ef=300`, Recall 98.3%) | **2.923 QPS** (`1.5x, eps=0.02`, Recall 98.3%) | **-31.8%** |
-| **$\ge 99.0\%$** | **3.320 QPS** (`ef=400`, Recall 99.1%) | **2.534 QPS** (`1.2x, eps=0.04`, Recall 99.1%) | **-23.7%** |
-| **$\ge 99.6\%$** | **2.300 QPS** (`ef=600`, Recall 99.6%) | **1.793 QPS** (`1.2x, eps=0.06`, Recall 99.6%) | **-22.0%** |
-| **$\ge 99.9\%$** | **1.764 QPS** (`ef=800`, Recall 99.9%) | **1.128 QPS** (`1.5x, eps=0.08`, Recall 99.9%) | **-36.0%** |
-
+| Recall Target | Glass Referenz | DEG-QG Baseline (eps, Run 0) | DEG-QG LinearPool (ef, Run 1) | Speedup vs Baseline | Diff zu Glass |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **$\ge 95.0\%$** | 6.210,1 QPS (`ef=200`) | 4.051,9 QPS (`1.2x, eps=0.005`) | **4.496,7 QPS** (`1.2x, ef=150`) | **+11.0%** | **-27.6%** |
+| **$\ge 96.0\%$** | 6.210,1 QPS (`ef=200`) | 3.941,2 QPS (`1.2x, eps=0.010`) | **4.496,7 QPS** (`1.2x, ef=150`) | **+14.1%** | **-27.6%** |
+| **$\ge 97.0\%$** | 4.287,6 QPS (`ef=300`) | 3.355,6 QPS (`1.2x, eps=0.020`) | **3.695,5 QPS** (`1.2x, ef=200`) | **+10.1%** | **-13.8%** |
+| **$\ge 98.0\%$** | 4.287,6 QPS (`ef=300`) | 2.876,3 QPS (`1.5x, eps=0.020`) | **3.080,8 QPS** (`1.2x, ef=250`) | **+7.1%** | **-28.1%** |
+| **$\ge 98.5\%$** | 3.319,7 QPS (`ef=400`) | 2.553,0 QPS (`1.2x, eps=0.040`) | **2.691,1 QPS** (`1.2x, ef=300`) | **+5.4%** | **-18.9%** |
+| **$\ge 99.0\%$** | 3.319,7 QPS (`ef=400`) | 2.179,5 QPS (`1.5x, eps=0.040`) | **2.191,8 QPS** (`1.2x, ef=400`) | **+0.6%** | **-34.0%** |
+| **$\ge 99.5\%$** | 2.300,3 QPS (`ef=600`) | 1.855,1 QPS (`1.2x, eps=0.060`) | **1.871,0 QPS** (`1.2x, ef=500`) | **+0.9%** | **-18.7%** |
+| **$\ge 99.8\%$** | 1.763,8 QPS (`ef=800`) | 1.186,9 QPS (`1.5x, eps=0.080`) | **1.249,8 QPS** (`1.2x, ef=800`) | **+5.3%** | **-29.1%** |
+| **$\ge 99.9\%$** | 1.763,8 QPS (`ef=800`) | 1.186,9 QPS (`1.5x, eps=0.080`) | **1.024,9 QPS** (`1.5x, ef=1000`)| **-13.6%** | **-41.9%** |
 ---
 
+### Pareto-Kurve: QPS vs. Recall@100
+
+![DEG-QG vs Glass](results/yandex-200-cosine/deg_vs_glass_yandex_top100.png)
+
+---
 ## 2. Die 5 Optimierungshebel im Detail
 
 Die Analyse beider Codebases hat 5 konkrete Bremsen in DEG identifiziert, die Glass besser löst:

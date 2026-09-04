@@ -21,8 +21,8 @@ def generate_markdown_report(dataset_name, data, output_path):
             best = max(candidates, key=lambda x: x["qps"])
             prune_str = "Pruned" if best["prune_rng"] else "No-Prune"
             rerank_str = f"{best.get('rerank_factor', 1.0):.1f}x"
-            md.append(f"| **$\\ge {t*100:4.1f}\\%$** | **{best['recall_100']*100:6.2f} %** | **{best['qps']:7.1f}** | {best['search_time_ms']:5.2f} ms | $K={best['k']}$, {best['opt_target']}, {prune_str} | `{rerank_str}` | `eps={best['eps']}` |")
-
+            param_col = f"`ef={best['ef']}`" if best.get("ef", 0) > 0 else f"`eps={best['eps']}`"
+            md.append(f"| **$\\ge {t*100:4.1f}\\%$** | **{best['recall_100']*100:6.2f} %** | **{best['qps']:7.1f}** | {best['search_time_ms']:5.2f} ms | $K={best['k']}$, {best['opt_target']}, {prune_str} | `{rerank_str}` | {param_col} |")
     md.append("\n---\n")
 
     # 2. Detailed Breakdown per Configuration
@@ -41,10 +41,11 @@ def generate_markdown_report(dataset_name, data, output_path):
         
         has_rerank = "rerank_factor" in r0
         if has_rerank:
-            md.append("| `rerank_factor` | `search_eps` | Recall@100 | QPS (Single-Core) | Latency / Query |")
+            md.append("| `rerank_factor` | `param` | Recall@100 | QPS (Single-Core) | Latency / Query |")
             md.append("| :--- | :--- | :--- | :--- | :--- |")
             for r in records:
-                md.append(f"| `{r['rerank_factor']:.1f}x` | `{r['eps']:5.3f}` | **{r['recall_100']*100:6.2f} %** | {r['qps']:7.1f} | {r['search_time_ms']:5.2f} ms |")
+                param_str = f"`ef={r['ef']}`" if r.get("ef", 0) > 0 else f"`eps={r['eps']:5.3f}`"
+                md.append(f"| `{r['rerank_factor']:.1f}x` | {param_str} | **{r['recall_100']*100:6.2f} %** | {r['qps']:7.1f} | {r['search_time_ms']:5.2f} ms |")
         else:
             md.append("| `search_eps` | Recall@100 | QPS (Single-Core) | Latency / Query |")
             md.append("| :--- | :--- | :--- | :--- |")

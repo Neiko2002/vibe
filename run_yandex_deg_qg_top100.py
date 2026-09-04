@@ -31,7 +31,7 @@ def run_benchmark():
     print(f"Found {len(defs)} parameter configurations for DEG-QG ({len(defs[0].query_argument_groups)} queries each).", flush=True)
 
     summary_records = []
-    summary_file = Path("results") / dataset_name / "deg_qg_summary_top100_int8_avx2.json"
+    summary_file = Path("results") / dataset_name / "deg_qg_summary_top100_run2.json"
     summary_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Load Ground Truth distances for official VIBE Recall@100 computation
@@ -56,8 +56,17 @@ def run_benchmark():
                 algo, X_train, X_test, distance, count, runs, definition.gpu
             )
 
-            rerank_factor = query_arguments[0]
-            search_eps = query_arguments[1]
+            rerank_factor = float(query_arguments[0])
+            raw_param = query_arguments[1]
+            is_ef = isinstance(raw_param, int) or (isinstance(raw_param, float) and raw_param >= 1.0 and raw_param.is_integer())
+            if is_ef:
+                ef_val = int(raw_param)
+                eps_val = 0.0
+                param_str = f"ef={ef_val:4d}"
+            else:
+                ef_val = 0
+                eps_val = float(raw_param)
+                param_str = f"eps={eps_val:5.3f}"
 
             descriptor.update({
                 "build_time": build_time,
@@ -68,7 +77,8 @@ def run_benchmark():
                 "opt_target": definition.arguments[2],
                 "prune_non_rng": definition.arguments[3],
                 "rerank_factor": rerank_factor,
-                "search_eps": search_eps,
+                "search_eps": eps_val,
+                "ef": ef_val,
             })
 
             # Store standard VIBE HDF5 result under results/yandex-200-cosine/100/deg-qg/
@@ -84,7 +94,7 @@ def run_benchmark():
             latency_ms = float(descriptor.get("best_search_time", 0)) * 1000
 
             # Print every query evaluation
-            print(f"  -> [{pos:2d}/{len(definition.query_argument_groups)}] rerank={rerank_factor:.1f}x, eps={search_eps:5.3f} | Recall@100: {mean_recall*100:6.2f}% | QPS: {qps:7.1f} | Latency: {latency_ms:5.3f}ms", flush=True)
+            print(f"  -> [{pos:2d}/{len(definition.query_argument_groups)}] rerank={rerank_factor:.1f}x, {param_str} | Recall@100: {mean_recall*100:6.2f}% | QPS: {qps:7.1f} | Latency: {latency_ms:5.3f}ms", flush=True)
 
             rec = {
                 "config": str(definition.arguments),
@@ -93,7 +103,8 @@ def run_benchmark():
                 "opt_target": definition.arguments[2],
                 "prune_rng": definition.arguments[3],
                 "rerank_factor": rerank_factor,
-                "eps": search_eps,
+                "eps": eps_val,
+                "ef": ef_val,
                 "recall_100": mean_recall,
                 "qps": qps,
                 "search_time_ms": latency_ms,
@@ -110,7 +121,7 @@ def run_benchmark():
 
     # Generate Markdown Report
     from generate_report import generate_markdown_report
-    generate_markdown_report(f"{dataset_name}-DEG-QG-INT8-AVX2", summary_records, Path("results") / dataset_name / "DEG_QG_INT8_AVX2_YANDEX_TOP100_RESULTS.md")
+    generate_markdown_report(f"{dataset_name}-DEG-QG-RUN2", summary_records, Path("results") / dataset_name / "DEG_QG_RUN2_YANDEX_TOP100_RESULTS.md")
 
 
 if __name__ == "__main__":
