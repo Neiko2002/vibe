@@ -23,19 +23,20 @@ def load_run(json_path):
 
 
 def main():
-    # 1. Glass Referenz
+    # 1. Vollständige Glass Referenz (Pareto-Front über alle R und ef Konfigurationen)
     with open("results/yandex-200-cosine/glass_summary_top100_LINUX.json") as f:
         glass_all = json.load(f)
-    glass_r48 = [
-        {"recall": g["recall_100"], "qps": g["qps"], "param": f"ef={g['ef']}"}
+    glass_all_pts = [
+        {"recall": g["recall_100"], "qps": g["qps"], "param": f"R={g['R']}, ef={g['ef']}"}
         for g in glass_all
-        if g["R"] == 48 and g["quant"] == "SQ8U" and g["search_quant"] == "SQ8U" and g["refine_quant"] == "FP16"
+        if g["quant"] == "SQ8U"
     ]
+    glass_pareto = get_pareto_frontier(glass_all_pts)
 
-    # ALLE Runs lückenlos von Run 0 bis Run 7:
+    # Alle DEG Runs lückenlos von Run 0 bis Run 7:
     runs = {
-        "glass": (get_pareto_frontier(glass_r48), {
-            "color": "#D90429", "label": "Glass Referenz (HNSW R=48, SQ8U->FP16)", "marker": "o", "lw": 3.0, "ms": 7, "zorder": 12
+        "glass": (glass_pareto, {
+            "color": "#D90429", "label": "Glass Referenz (Vollständige Pareto-Front, R=16..48)", "marker": "o", "lw": 3.0, "ms": 7, "zorder": 12
         }),
         "r0": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_baseline_eps_top100.json")), {
             "color": "#ADB5BD", "label": "Run 0: Baseline (eps-Radius, K=48)", "marker": "x", "lw": 1.4, "ms": 5, "ls": ":", "zorder": 2
@@ -59,7 +60,7 @@ def main():
             "color": "#2D6A4F", "label": "Run 6: Vector Tail + 4CL Prefetch (Fine Grid)", "marker": "h", "lw": 2.5, "ms": 7, "zorder": 8
         }),
         "r7": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run7.json") + load_run("results/yandex-200-cosine/deg_qg_summary_top100_run6.json")), {
-            "color": "#081C15", "label": "Run 7: Contiguous 256B Aligned + Adaptiv Rerank", "marker": "D", "lw": 3.2, "ms": 8, "zorder": 11
+            "color": "#081C15", "label": "DEG-QG Run 7 (Bester Stand: 256B Aligned + Adaptiv Rerank)", "marker": "D", "lw": 3.2, "ms": 8, "zorder": 11
         }),
     }
 
@@ -70,29 +71,26 @@ def main():
         py = [p["qps"] for p in pareto if p["recall"] >= 0.88]
         ax.plot(px, py, **style)
 
-    ax.set_xlim(0.89, 1.002)
-    ax.set_ylim(0, 14500)
+    ax.set_xlim(0.93, 1.001)
+    ax.set_ylim(1000, 11000)
     ax.set_xlabel("Recall@100", fontsize=13, fontweight="bold")
     ax.set_ylabel("QPS (Queries / Sekunde)", fontsize=13, fontweight="bold")
-    ax.set_title("Vollständige AutoResearch Evolution: ALLE Runs (0 bis 7) vs. Glass auf yandex-200-cosine",
+    ax.set_title("Echter Pareto-Vergleich im Fokus-Bereich (Recall >= 94%): Glass vs. DEG-QG (Single-Core)",
                  fontsize=14, fontweight="bold", pad=15)
     ax.grid(True, which="both", ls=":", alpha=0.6)
     ax.legend(loc="upper right", fontsize=10, framealpha=0.95)
 
-    # Key Annotations
-    ax.annotate("Run 7 (1.0x, ef=100)\n10.454 QPS @ 92.55% (+32.4% vs Glass)", (0.9255, 10453.5), textcoords="offset points", xytext=(-60, 25),
-                arrowprops=dict(arrowstyle="->", color="#081C15", lw=1.3), fontsize=9, color="#081C15", fontweight="bold")
-    ax.annotate("Run 7 (1.0x, ef=150)\n7.757 QPS @ 95.25% (+24.9% vs Glass)", (0.9525, 7757.4), textcoords="offset points", xytext=(-100, 25),
-                arrowprops=dict(arrowstyle="->", color="#081C15", lw=1.3), fontsize=9, color="#081C15", fontweight="bold")
-    ax.annotate("Glass (ef=20)\n7.897 QPS @ 94.88%", (0.9488, 7897.4), textcoords="offset points", xytext=(20, 20),
+    # Reale Vergleiche & Lücken-Annotationen
+    ax.annotate("Glass (R=48, ef=20)\n7.897 QPS @ 94.88% (führt vor DEG 7.623)", (0.9488, 7897.4), textcoords="offset points", xytext=(20, 20),
                 arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.3), fontsize=9, color="#D90429", fontweight="bold")
-    ax.annotate("Run 6 (1.2x, ef=350)\n3.452 QPS @ 99.09% (+4.0% vs Glass)", (0.9909, 3451.7), textcoords="offset points", xytext=(-130, 25),
-                arrowprops=dict(arrowstyle="->", color="#081C15", lw=1.3), fontsize=9, color="#081C15", fontweight="bold")
-    ax.annotate("Glass (ef=400)\n3.320 QPS @ 99.06%", (0.9906, 3319.7), textcoords="offset points", xytext=(-90, -35),
+    ax.annotate("Glass (R=48, ef=200)\n6.210 QPS @ 96.82% (führt vor DEG 5.127)", (0.9682, 6210.1), textcoords="offset points", xytext=(-120, 25),
                 arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.3), fontsize=9, color="#D90429", fontweight="bold")
-    ax.annotate("Run 6 (1.1x, ef=600)\n2.266 QPS @ 99.80% (+28.4% vs Glass)", (0.9980, 2265.5), textcoords="offset points", xytext=(-140, -35),
+    ax.annotate("DEG Run 7 (1.15x, ef=250)\n4.526 QPS @ 98.41% vs Glass 4.313", (0.9841, 4525.6), textcoords="offset points", xytext=(-130, 25),
                 arrowprops=dict(arrowstyle="->", color="#081C15", lw=1.3), fontsize=9, color="#081C15", fontweight="bold")
-
+    ax.annotate("Glass führt bei 99.9%:\n1.764 QPS @ 99.90% (DEG: 1.577 QPS, -10.6%)", (0.9990, 1763.8), textcoords="offset points", xytext=(-180, 25),
+                arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.5), fontsize=9, color="#D90429", fontweight="bold")
+    ax.annotate("Glass erreicht 99.96% (1.421 QPS)\nDEG bricht bei 99.91% ab!", (0.9996, 1421.0), textcoords="offset points", xytext=(-160, -35),
+                arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.5), fontsize=9, color="#D90429", fontweight="bold")
     output_path = "results/yandex-200-cosine/deg_vs_glass_yandex_top100.png"
     plt.savefig(output_path, bbox_inches="tight")
     print(f"Plot successfully saved at {output_path}")
