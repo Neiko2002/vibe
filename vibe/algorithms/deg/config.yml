@@ -31,5 +31,5 @@ float:
           opt_target: ['LowLID']
           prune_non_rng: [false]
         query_args:
-          rerank_size_factor: [1.2, 1.5]
-          ef: [100, 150, 200, 250, 300, 400, 500, 600, 800, 1000]
+          rerank_size_factor: [1.15, 1.2]
+          ef: [100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]
