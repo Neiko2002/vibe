@@ -68,8 +68,8 @@ def main():
         "r16": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run16_latest.json")), {
             "color": "#F77F00", "label": "Run 16: AVX-512 F16C Batch Reranker (4.363 QPS)", "marker": "^", "lw": 2.2, "ms": 7, "ls": "--", "zorder": 13
         }),
-        "r19": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_autoresearch_latest.json")), {
-            "color": "#9B5DE5", "label": "Aktueller Rekord (Run 19): SIMD Medoids + Dual VNNI (4.404 QPS)", "marker": "*", "lw": 3.8, "ms": 11, "zorder": 16
+        "r21": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_autoresearch_latest.json")), {
+            "color": "#9B5DE5", "label": "Aktueller Rekord (Run 21): 4.467 QPS (1.695 QPS @ 99.9%)", "marker": "*", "lw": 3.8, "ms": 11, "zorder": 16
         }),
     }
 
@@ -103,7 +103,7 @@ def main():
                 arrowprops=dict(arrowstyle="->", color="#9B5DE5", lw=1.5), fontsize=9, color="#9B5DE5", fontweight="bold")
     ax.annotate("Aktuell Run 19 (ef=500)\n2.720 QPS @ 99.57% (+18.2% vs Glass 2.300)", (0.9957, 2719.5), textcoords="offset points", xytext=(25, 25),
                 arrowprops=dict(arrowstyle="->", color="#9B5DE5", lw=1.5), fontsize=9, color="#9B5DE5", fontweight="bold")
-    ax.annotate("Aktuell Run 19 (1.35x, ef=850)\n1.680 QPS @ 99.90% (Glass: 1.764 QPS)", (0.9990, 1680.0), textcoords="offset points", xytext=(-185, -45),
+    ax.annotate("Aktuell Run 21 (1.35x, ef=845)\n1.695 QPS @ 99.90% (Glass: 1.764 QPS)", (0.9990, 1694.8), textcoords="offset points", xytext=(-185, -45),
                 arrowprops=dict(arrowstyle="->", color="#9B5DE5", lw=1.5), fontsize=9, color="#9B5DE5", fontweight="bold")
     ax.annotate("Glass (ef=1000)\n1.421 QPS @ 99.96%", (0.9996, 1421.0), textcoords="offset points", xytext=(-110, -45),
                 arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.3), fontsize=9, color="#D90429", fontweight="bold")
