@@ -47,20 +47,30 @@ def main():
         for d in deg_r2_all
     ]
 
+    # 5. Load DEG Run 3 (Auto Prefetch po=14, pl=4)
+    with open("results/yandex-200-cosine/deg_qg_summary_top100_run3.json") as f:
+        deg_r3_all = json.load(f)
+    deg_r3 = [
+        {"recall": d["recall_100"], "qps": d["qps"], "param": f"ef={d['ef']}"}
+        for d in deg_r3_all
+    ]
+
     glass_pareto = get_pareto_frontier(glass_r48)
     base_pareto = get_pareto_frontier(deg_base)
     lp_pareto = get_pareto_frontier(deg_lp)
     r2_pareto = get_pareto_frontier(deg_r2)
+    r3_pareto = get_pareto_frontier(deg_r3)
 
     # Plot
-    fig, ax = plt.subplots(figsize=(10, 7), dpi=300)
+    fig, ax = plt.subplots(figsize=(11, 7.5), dpi=300)
 
     # Styling
     styles = {
         "glass": {"color": "#E63946", "label": "Glass (HNSW R=48, SQ8U->FP16)", "marker": "o", "lw": 2.5, "ms": 7},
-        "base": {"color": "#6C757D", "label": "DEG-QG Baseline (eps-Radius, K=48)", "marker": "s", "lw": 1.8, "ms": 5, "ls": "--"},
-        "lp": {"color": "#457B9D", "label": "DEG-QG Phase 1 (LinearPool ef, K=48)", "marker": "^", "lw": 2.0, "ms": 6, "ls": "-."},
-        "r2": {"color": "#2A9D8F", "label": "DEG-QG Run 2 (64 Medoids + Edge Prefetch)", "marker": "D", "lw": 2.8, "ms": 7},
+        "base": {"color": "#ADB5BD", "label": "DEG-QG Baseline (eps-Radius, K=48)", "marker": "s", "lw": 1.5, "ms": 4, "ls": ":"},
+        "lp": {"color": "#6C757D", "label": "DEG-QG Run 1 (LinearPool ef, K=48)", "marker": "^", "lw": 1.6, "ms": 5, "ls": "--"},
+        "r2": {"color": "#457B9D", "label": "DEG-QG Run 2 (64 Medoids + Edge Prefetch)", "marker": "v", "lw": 2.0, "ms": 6, "ls": "-."},
+        "r3": {"color": "#2A9D8F", "label": "DEG-QG Run 3 (Auto Prefetch po=14, pl=4)", "marker": "D", "lw": 2.8, "ms": 7},
     }
 
     # Glass curve
@@ -83,6 +93,11 @@ def main():
     r2y = [p["qps"] for p in r2_pareto if p["recall"] >= 0.94]
     ax.plot(r2x, r2y, **styles["r2"])
 
+    # DEG Run 3 curve
+    r3x = [p["recall"] for p in r3_pareto if p["recall"] >= 0.94]
+    r3y = [p["qps"] for p in r3_pareto if p["recall"] >= 0.94]
+    ax.plot(r3x, r3y, **styles["r3"])
+
     ax.set_xlim(0.945, 1.002)
     ax.set_ylim(0, 8500)
     ax.set_xlabel("Recall@100", fontsize=13, fontweight="bold")
@@ -90,14 +105,14 @@ def main():
     ax.set_title("yandex-200-cosine Top-100 — QPS vs. Recall@100 (Linear Scale)",
                  fontsize=14, fontweight="bold", pad=15)
     ax.grid(True, which="both", ls=":", alpha=0.6)
-    ax.legend(loc="upper right", fontsize=10.5, framealpha=0.95)
+    ax.legend(loc="upper right", fontsize=10, framealpha=0.95)
 
     # Annotations
-    ax.annotate("Run 2 (ef=250)\n3.881 QPS @ 98.2%", (0.9820, 3881.1), textcoords="offset points", xytext=(-95, 20),
-                arrowprops=dict(arrowstyle="->", color="#2A9D8F", lw=1.3), fontsize=9, color="#2A9D8F", fontweight="bold")
-    ax.annotate("Glass (ef=400)\n3.320 QPS @ 99.1%", (0.9906, 3319.7), textcoords="offset points", xytext=(-95, 25),
+    ax.annotate("Glass (ef=600)\n2.300 QPS @ 99.6%", (0.9962, 2300.3), textcoords="offset points", xytext=(-95, 20),
                 arrowprops=dict(arrowstyle="->", color="#E63946", lw=1.3), fontsize=9, color="#E63946", fontweight="bold")
-    ax.annotate("Run 2 (ef=400)\n2.702 QPS @ 99.4%", (0.9940, 2701.6), textcoords="offset points", xytext=(-95, -30),
+    ax.annotate("Run 3 (ef=500)\n2.328 QPS @ 99.56% (Überholt!)", (0.9956, 2327.9), textcoords="offset points", xytext=(-120, -35),
+                arrowprops=dict(arrowstyle="->", color="#2A9D8F", lw=1.3), fontsize=9, color="#2A9D8F", fontweight="bold")
+    ax.annotate("Run 3 (ef=200)\n4.626 QPS @ 97.6% (+7.9% vs Glass)", (0.9756, 4626.2), textcoords="offset points", xytext=(-30, 25),
                 arrowprops=dict(arrowstyle="->", color="#2A9D8F", lw=1.3), fontsize=9, color="#2A9D8F", fontweight="bold")
 
     output_path = "results/yandex-200-cosine/deg_vs_glass_yandex_top100.png"
