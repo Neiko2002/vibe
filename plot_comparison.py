@@ -65,8 +65,11 @@ def main():
         "phase2": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_phase2_final.json")), {
             "color": "#7209B7", "label": "Phase 2 (Run 11): Feines ef-Gitter & Rerank (4.233 QPS)", "marker": "*", "lw": 2.4, "ms": 7, "ls": "-.", "zorder": 10
         }),
-        "latest": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_autoresearch_latest.json")), {
-            "color": "#FF7B00", "label": "Aktueller Stand (Run 16/17): AVX-512 F16C Batch Reranker (4.363 QPS)", "marker": "*", "lw": 3.6, "ms": 10, "zorder": 15
+        "r16": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_summary_top100_run16_latest.json")), {
+            "color": "#F77F00", "label": "Run 16: AVX-512 F16C Batch Reranker (4.363 QPS)", "marker": "^", "lw": 2.2, "ms": 7, "ls": "--", "zorder": 13
+        }),
+        "r19": (get_pareto_frontier(load_run("results/yandex-200-cosine/deg_qg_autoresearch_latest.json")), {
+            "color": "#9B5DE5", "label": "Aktueller Rekord (Run 19): SIMD Medoids + Dual VNNI (4.404 QPS)", "marker": "*", "lw": 3.8, "ms": 11, "zorder": 16
         }),
     }
 
@@ -94,14 +97,14 @@ def main():
                 arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.3), fontsize=9, color="#D90429", fontweight="bold")
     ax.annotate("Run 7 / Aktuell (ef=150)\n7.706 QPS @ 95.25% (+24.1% vs Glass)", (0.9525, 7706.4), textcoords="offset points", xytext=(25, 25),
                 arrowprops=dict(arrowstyle="->", color="#081C15", lw=1.3), fontsize=9, color="#081C15", fontweight="bold")
-    ax.annotate("Aktuell Run 16 (ef=250)\n4.815 QPS @ 98.41% (+12.3% vs Glass 4.288)", (0.9841, 4815.2), textcoords="offset points", xytext=(-170, 35),
-                arrowprops=dict(arrowstyle="->", color="#FF7B00", lw=1.5), fontsize=9, color="#FF7B00", fontweight="bold")
-    ax.annotate("Aktuell Run 16 (ef=350)\n3.644 QPS @ 99.09% (+9.8% vs Glass 3.320)", (0.9909, 3644.2), textcoords="offset points", xytext=(-170, 25),
-                arrowprops=dict(arrowstyle="->", color="#FF7B00", lw=1.5), fontsize=9, color="#FF7B00", fontweight="bold")
-    ax.annotate("Aktuell Run 16 (ef=500)\n2.698 QPS @ 99.57% (+17.3% vs Glass 2.300)", (0.9957, 2697.5), textcoords="offset points", xytext=(25, 25),
-                arrowprops=dict(arrowstyle="->", color="#FF7B00", lw=1.5), fontsize=9, color="#FF7B00", fontweight="bold")
-    ax.annotate("Aktuell Run 17 (1.35x, ef=850)\n1.663 QPS @ 99.90% (Glass: 1.764 QPS)", (0.9990, 1662.9), textcoords="offset points", xytext=(-185, -45),
-                arrowprops=dict(arrowstyle="->", color="#FF7B00", lw=1.5), fontsize=9, color="#FF7B00", fontweight="bold")
+    ax.annotate("Aktuell Run 19 (ef=250)\n4.849 QPS @ 98.41% (+13.1% vs Glass 4.288)", (0.9841, 4848.9), textcoords="offset points", xytext=(-170, 35),
+                arrowprops=dict(arrowstyle="->", color="#9B5DE5", lw=1.5), fontsize=9, color="#9B5DE5", fontweight="bold")
+    ax.annotate("Aktuell Run 19 (ef=350)\n3.661 QPS @ 99.09% (+10.3% vs Glass 3.320)", (0.9909, 3660.7), textcoords="offset points", xytext=(-170, 25),
+                arrowprops=dict(arrowstyle="->", color="#9B5DE5", lw=1.5), fontsize=9, color="#9B5DE5", fontweight="bold")
+    ax.annotate("Aktuell Run 19 (ef=500)\n2.720 QPS @ 99.57% (+18.2% vs Glass 2.300)", (0.9957, 2719.5), textcoords="offset points", xytext=(25, 25),
+                arrowprops=dict(arrowstyle="->", color="#9B5DE5", lw=1.5), fontsize=9, color="#9B5DE5", fontweight="bold")
+    ax.annotate("Aktuell Run 19 (1.35x, ef=850)\n1.680 QPS @ 99.90% (Glass: 1.764 QPS)", (0.9990, 1680.0), textcoords="offset points", xytext=(-185, -45),
+                arrowprops=dict(arrowstyle="->", color="#9B5DE5", lw=1.5), fontsize=9, color="#9B5DE5", fontweight="bold")
     ax.annotate("Glass (ef=1000)\n1.421 QPS @ 99.96%", (0.9996, 1421.0), textcoords="offset points", xytext=(-110, -45),
                 arrowprops=dict(arrowstyle="->", color="#D90429", lw=1.3), fontsize=9, color="#D90429", fontweight="bold")
     output_path = "results/yandex-200-cosine/deg_vs_glass_yandex_top100.png"
