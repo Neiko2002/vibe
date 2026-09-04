@@ -304,93 +304,76 @@ Dieses Dokument erfasst alle durchgeführten Experimente, Messergebnisse, Code-�
 
 ---
 
-## 4. Phase 2: Vollständige Dominanz von DEG-QG vs. Glass
+## 4. Phase 2: Detaillierte Dokumentation aller Fehlschläge & Vollständiger Rollback auf Run 7
 
-### Rahmenbedingungen & Strikte Constraints
-* **STRIKTER CONSTRAINT**: Multi-Threading ist im Benchmark verboten. Sämtliche Messungen laufen rein Single-Threaded (1 Thread).
-* **Ziel von Phase 2**:
-  1. Beseitigung des Medoid-Scan Overheads bei 90–95% Recall.
-  2. Vollständige Entkopplung von Topologie- und Feature-Speicher im `ReadOnlyGraph`.
-  3. Schließen der verbleibenden Lücke zu Glass bei Ultra-High-Recall ($\ge 99.9\%$).
+### Warum Phase 2 verworfen und alles auf Run 7 zurückgesetzt wurde
 
----
+Die genaue Analyse der echten Pareto-Front (jeder einzelne Messpunkt) hat offengelegt:
+**Phase 2 war an den entscheidenden Pareto-Punkten schlechter als Run 7!**
 
-### Run 10: Contiguous 64B-Aligned Edge Topology Matrix & Aligned Loads
+| Exakter Recall@100 | Run 7 QPS (Best) | Phase 2 QPS | Differenz (Phase 2 vs. Run 7) | Realer Status vs. Glass |
+| :--- | :--- | :--- | :--- | :--- |
+| **90.56 %** (`ef=80`) | **11.919,9 QPS** | 11.814,1 QPS | **-105,8 QPS langsamer** | Glass hat 7.897,4 QPS @ 94.88% |
+| **95.25 %** (`ef=150`) | **7.622,9 QPS** | 7.729,1 QPS | $+106,2$ QPS (Messrauschen) | Glass hat 6.210,1 QPS @ 96.82% |
+| **98.41 %** (`ef=250`) | **4.525,6 QPS** | 4.260,7 QPS | **-264,9 QPS langsamer! (-5.9%)** | Glass hat 4.287,6 QPS @ 98.33% |
+| **98.72 %** (`ef=300`) | **3.914,8 QPS** | 3.754,0 QPS | **-160,8 QPS langsamer! (-4.1%)** | Glass führt im Zwischenbereich |
+| **99.09 %** (`ef=350`) | **3.451,7 QPS** | 3.335,9 QPS | **-115,8 QPS langsamer! (-3.4%)** | Glass hat 3.319,7 QPS @ 99.06% |
+| **99.41 %** (`ef=450`) | **2.879,0 QPS** | — | Fehlt in Phase 2 | **Glass hat 2.710,9 QPS @ 99.40%** |
+| **99.57 %** (`ef=500`) | **2.644,1 QPS** | 2.534,7 QPS | **-109,4 QPS langsamer! (-4.1%)** | Glass hat 2.300,3 QPS @ 99.62% |
+| **99.80 %** (`ef=600`) | **2.265,5 QPS** | 2.176,5 QPS | **-89,0 QPS langsamer! (-3.9%)** | Glass hat 1.763,8 QPS @ 99.90% |
+| **99.89 %** (`ef=800`) | **1.768,1 QPS** | 1.702,3 QPS | **-65,8 QPS langsamer! (-3.7%)** | Glass führt bei 99.9% mit 1.763,8 QPS |
+| **99.90 %** (`ef=900`) | **1.576,7 QPS** | 1.606,0 QPS (`ef=850`)| $+29,3$ QPS (nur durch feineres ef) | **Glass führt souverän: 1.763,8 QPS (+10.6%)** |
 
-* **Git Commit**: `597b2e4` in `DynamicExplorationGraph`
-* **Report-Datei**: `results/yandex-200-cosine/DEG_QG_RUN10_YANDEX_TOP100_RESULTS.md`
-* **Rohdaten**: `results/yandex-200-cosine/deg_qg_summary_top100_run10.json`
-* **Problem**: Kantenlisten lagen zuvor in der alten `ReadOnlyGraph`-Struktur ($396\text{ B}$ pro Knoten, unaligned, $200\text{ B}$ Offset innerhalb der Cacheline $\rightarrow$ Verschnitt über 4 Cachelines).
-* **Code-Änderungen**:
-  1. `readonly_graph.h`: Allokation von `contiguous_edges_memory_` ($N \times 48 \times 4\text{ Bytes} = 192\text{ MB}$, exakt $3 \times 64\text{ Bytes}$ pro Knoten), 64-Byte cacheline-aligned.
-  2. `internal_graph.h`: Reduktion des Kanten-Prefetchings von 4 auf exakt 3 Cachelines (`n_ptr`, `n_ptr + 64`, `n_ptr + 128`).
-  3. Umstellung auf ausgerichtete Vektor-Loads `_mm512_load_si512` für alle Feature-Vektoren.
-* **Ergebnis**: Pareto-Mittel steigt von $4.103,3\text{ QPS}$ auf **$4.182,9\text{ QPS}$** ($+79,6\text{ QPS}$, $+1.9\%$).
-
----
-
-### Run 8: Medoid-Scan Optimierung & SIMD-Vektorisierung
-
-* **Git Commit**: `071ff6d` in `DynamicExplorationGraph`
-* **Report-Datei**: `results/yandex-200-cosine/DEG_QG_RUN8_YANDEX_TOP100_RESULTS.md`
-* **Rohdaten**: `results/yandex-200-cosine/deg_qg_summary_top100_run8.json`
-* **Problem**: Der sequentielle Scan über 128 Medoide rief zuvor generische Distanzfunktionen auf und berechnete $q_{\text{correction}}$ 128-mal neu ($15\,\mu\text{s}$ Latenz vor jedem Graphstart).
-* **Untersuchung & Negative Learnings**:
-  * *Hierarchisches 2-Stufen Medoid-Routing (16 Primär-Medoide $\rightarrow$ 8 Sub-Medoide)*: Führte zu einem leichten Recall-Knick von $0,8\%$ bei kleinen $ef$-Budgets ($89,6\%$ statt $90,5\%$ bei $ef=80$), da $D=200$ Vektorraumgrenzen nicht verlustfrei in 2 Cluster gepresst werden können.
-* **Erfolgreiche Lösung (Run 8c)**:
-  1. Beibehaltung der mathematisch perfekten 128 flachen K-Means Medoide für maximale globale Dispersion.
-  2. Vorab-Berechnung von $q_0 \dots q_3$, $q_{\text{comp}}$ und $q_{\text{correction}}$ vor dem Medoid-Scan.
-  3. Hand-unrolled 512-bit AVX-512 VNNI Scan mit Pipelined Prefetching für alle 128 Medoide.
-  4. Reduktion der Scan-Dauer von $15\,\mu\text{s}$ auf **$0,6\,\mu\text{s}$** ohne jeglichen Recall-Verlust.
-* **Ergebnis**: Pareto-Mittel steigt auf **$4.203,0\text{ QPS}$** ($+20,1\text{ QPS}$), $\ge 90.0\%$ Recall erreicht Rekordwert von **$12.125,1\text{ QPS}$** ($+53,5\%$ schneller als Glass).
+**Erkenntnis**:
+Die aggregierte Stufentabelle täuschte künstliche Gewinne vor, weil grobe Recall-Schwellen den jeweils besten Punkt nahmen, während im gesamten Hoch-Recall-Bereich ($98.0\%$ bis $99.8\%$) die Phase-2-Änderungen die Durchsatzleistung um **$3\%$ bis $6\%$ drückten**.
+Daher wurde **sämtlicher Phase-2-Code vollständig zurückgerollt**:
+* `DynamicExplorationGraph`: Hard Reset auf Commit `18fbb2ac` (Run 7).
+* `vibe`: Hard Reset auf Commit `47459dd` (Run 7).
+* C++ Wheel / Extension: Neu kompiliert direkt aus Run 7 Stand.
 
 ---
 
-### Run 9: Feingranulares $ef$-Gitter & Rerank-Faktoren (1.35x, 1.5x)
+### Detaillierte Ursachenanalyse aller Fehlschläge in Phase 2
 
-* **Git Commit**: `8812c79` in `vibe`
-* **Report-Datei**: `results/yandex-200-cosine/DEG_QG_RUN9_YANDEX_TOP100_RESULTS.md`
-* **Rohdaten**: `results/yandex-200-cosine/deg_qg_summary_top100_run9.json`
-* **Problem**: Zwischen $ef=800$ (Recall $99,890\%$) und $ef=900$ (Recall $99,903\%$) klaffte ein 100-Punkte-Sprung. DEG musste bisher bis $ef=900$ suchen, um $99,9\%$ zu garantieren.
-* **Code-Änderungen**:
-  1. `config.yml`: Erweiterung der Rerank-Faktoren um $1.35\times$ und $1.50\times$.
-  2. `config.yml`: Feine $ef$-Schritte $ef \in [825, 850, 860, 875]$.
-  3. Bei $ef=850$ ($1.35\times$) wird der Zielwert von $99,90\%$ exakt getroffen.
-* **Ergebnis**: Sprung des Pareto-Mittels auf **$4.232,9\text{ QPS}$** ($+10,1\%$ über Glass). QPS bei $\ge 99,9\%$ Recall steigt von $1.506,5\text{ QPS}$ auf **$1.620,1\text{ QPS}$** ($+7,5\%$).
+#### **Fehlschlag 1: Hierarchisches 2-Stufen Medoid-Routing (Runs 2 & 6)**
+* **Hypothese**: 16 Primär-Medoide scannen $\rightarrow$ Top 2–4 Cluster auswählen $\rightarrow$ nur deren Sub-Medoide evaluieren ($32$ bis $48$ Distanzen statt $128$).
+* **Reales Ergebnis**: Recall bei $ef=80$ brach von $90,56\%$ auf **$89,64\%$** ein. Dadurch verfehlte $ef=80$ die $90\%$-Schwelle, und der nächste Punkt ($ef=100$) schaffte nur noch $10.150\text{ QPS}$ statt bisher $12.078\text{ QPS}$ (**$-16,0\%$ massiver Einbruch**).
+* **Ursache**: Im 200-dimensionalen Raum mit Cosine-Metrik ist der Raum hochgradig nicht-linear gekrümmt. Queries in Grenzbereichen zwischen Clustern wurden durch die Vorauswahl auf falsche Cluster gelenkt. Die 128 flachen K-Means Medoide bieten eine unersetzliche, globale Poisson-Disk-Raumabdeckung.
 
----
+#### **Fehlschlag 2: Contiguous Edge Topology Matrix & 512b Aligned Loads (Run 10)**
+* **Hypothese**: Auslagerung aller Kanten in ein separates $192\text{ MB}$ 64B-aligned Array (`contiguous_edges_memory_`) sollte Cacheline-Splits eliminieren.
+* **Reales Ergebnis**: Die QPS sanken bei $ef=250$ von $4.525,6$ auf $4.344,9$ ($-4,0\%$) und bei $ef=500$ von $2.644,1$ auf $2.547,5$ ($-3,7\%$).
+* **Ursache**: Ein zweites großes $192\text{ MB}$ Array parallel zum $256\text{ MB}$ Feature-Array vergrößerte den aktiven Speicher-Footprint auf über $450\text{ MB}$. Dies führte zu höherem TLB-Druck (Translation Lookaside Buffer Misses) und verdrängte relevante Daten aus dem L3-Cache ($64\text{ MB}$). Im ursprünglichen Run-7-Layout liegen Kanten und Metadaten im selben Vertex-Block, was eine bessere räumliche Cache-Lokalität bot.
 
-## 5. Direkter Pareto-Vergleich: Glass vs. DEG-QG Phase 2 Final (Single-Core, Top-100)
+#### **Fehlschlag 3: LinearPool worst_dist Caching & Vis-Prefetching (Runs 5 & 8)**
+* **Hypothese**: Vorab-Prüfung gegen `worst_dist_` sollte Memory-Lookups im `LinearPool` sparen.
+* **Reales Ergebnis**: Pareto-QPS sank von $4.203$ auf $4.106\text{ QPS}$ ($-2,3\%$).
+* **Ursache**: Die zusätzlichen Verzweigungen (`if (dist >= worst_dist_)`) und Modifikationen in `find_bsearch` störten die Branch-Prediction der CPU in den engsten Schleifen. Prefetch-Instruktionen für das Visited-Bitset erzeugten Pipeline-Stalls.
 
-| Recall Target | Glass Referenz ($R=48, L=400$) | Baseline (Run 0, $\epsilon$) | **DEG-QG Phase 2 Final** | Speedup vs Baseline | **Status vs. Glass** |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **$\ge 90.0\%$** | 7.897,4 QPS (`ef=20`) | 4.503,0 QPS (`1.2x, eps=0.0`) | **12.165,9 QPS** (`1.0x, ef=80`) | **+170,2%** | **+54,0% schneller!** |
-| **$\ge 92.0\%$** | 7.897,4 QPS (`ef=20`) | 4.503,0 QPS (`1.2x, eps=0.0`) | **10.453,5 QPS** (`1.0x, ef=100`) | **+132,1%** | **+32,4% schneller!** |
-| **$\ge 95.0\%$** | 6.210,1 QPS (`ef=200`) | 4.051,9 QPS (`1.2x, eps=0.005`) | **7.801,2 QPS** (`1.0x, ef=150`) | **+92,5%** | **+25,6% schneller!** |
-| **$\ge 96.0\%$** | 6.210,1 QPS (`ef=200`) | 3.941,2 QPS (`1.2x, eps=0.010`) | **6.398,6 QPS** (`1.1x, ef=150`) | **+62,4%** | **+3,0% schneller!** |
-| **$\ge 97.0\%$** | 4.287,6 QPS (`ef=300`) | 3.355,6 QPS (`1.2x, eps=0.020`) | **5.126,8 QPS** (`1.1x, ef=200`) | **+52,8%** | **+19,6% schneller!** |
-| **$\ge 98.0\%$** | 4.287,6 QPS (`ef=300`) | 2.876,3 QPS (`1.5x, eps=0.020`) | **4.336,4 QPS** (`1.1x, ef=250`) | **+50,8%** | **+1,1% schneller!** |
-| **$\ge 98.5\%$** | 3.319,7 QPS (`ef=400`) | 2.553,0 QPS (`1.2x, eps=0.040`) | **3.914,8 QPS** (`1.1x, ef=300`) | **+53,3%** | **+17,9% schneller!** |
-| **$\ge 99.0\%$** | 3.319,7 QPS (`ef=400`) | 2.179,5 QPS (`1.5x, eps=0.040`) | **3.369,7 QPS** (`1.1x, ef=350`) | **+54,6%** | **+1,5% schneller!** |
-| **$\ge 99.5\%$** | 2.300,3 QPS (`ef=600`) | 1.855,1 QPS (`1.2x, eps=0.060`) | **2.560,3 QPS** (`1.1x, ef=500`) | **+38,0%** | **+11,3% schneller!** |
-| **$\ge 99.8\%$** | 1.763,8 QPS (`ef=800`) | 1.186,9 QPS (`1.5x, eps=0.080`) | **2.265,5 QPS** (`1.1x, ef=600`) | **+90,9%** | **+28,4% schneller!** |
-| **$\ge 99.9\%$** | **1.763,8 QPS** (`ef=800`) | 1.186,9 QPS (`1.5x, eps=0.080`) | **1.620,1 QPS** (`1.35x, ef=850`) | **+36,5%** | **-8,1% (Glass führt knapp)** |
-| **Pareto-Mittel** | **3.845,8 QPS** | **2.821,3 QPS** | **4.232,9 QPS** | **+50,0%** | **+10,1% VORSPRUNG VOR GLASS** |
+#### **Fehlschlag 4: 2-Way Dual-Pipe VNNI Unrolling (Run 4 & 13)**
+* **Hypothese**: Gleichzeitiges Berechnen zweier Nachbarn ($v_0, v_1$) sollte beide 512-bit Pipes auf AMD Zen 5 parallel sättigen.
+* **Reales Ergebnis**: QPS sank im unteren Bereich auf $11.912\text{ QPS}$.
+* **Ursache**: Zu viele belegte ZMM-Register (16 ZMM-Register für Query, Masks, Vector-Chunks und Accumulatoren) führten zu Registerdruck. Die Skalar-Restbehandlung bei ungeraden Kantengrößen fraß den theoretischen Durchsatzgewinn vollständig auf.
+
+#### **Fehlschlag 5: Feines ef-Gitter als Scheingewinn (Run 9 & 11)**
+* **Hypothese**: Feinere $ef$-Schritte ($ef=850$) sollten bei $\ge 99.9\%$ Recall Glass überholen.
+* **Reales Ergebnis**: Die Kurve selbst verbesserte sich nicht; $ef=850$ erzeugte lediglich einen Zwischenpunkt bei $1.620\text{ QPS}$, während Glass bei $ef=800$ weiterhin mit **$1.763,8\text{ QPS}$ ($+8,9\%$ schneller)** führte.
 
 ---
 
-## 6. Gesamtfazit & Kernarchitektur
+## 5. Das echte Pareto-Fazit: Stand Run 7 (Verifizierte Baseline)
 
-1. **VOLLSTÄNDIGE DOMINANZ VOR GLASS**:
-   * In 5 von 6 Recall-Stufen (90.0%, 95.0%, 98.0%, 99.0%, 99.5%) schlägt DEG-QG Glass souverän im Single-Core:
-     * Bis zu **+54.0% schneller bei 90% Recall** (12.166 vs 7.897 QPS).
-     * **+25.6% schneller bei 95% Recall** (7.801 vs 6.210 QPS).
-     * **+11.3% schneller bei 99.5% Recall** (2.560 vs 2.300 QPS).
-     * Bei 99.9% Recall schrumpfte die Lücke auf nur noch 8.1% (1.620 vs 1.764 QPS).
-   * Das geometrische Mittel der QPS über alle Zielstufen liegt bei **4.232,9 QPS vs. 3.845,8 QPS** (**+10,1% Vorsprung vor Glass**).
+1. **Reale Stärken von DEG-QG (Run 7)**:
+   * DEG-QG schlägt Glass im Bereich **$90\%$ bis $97\%$ Recall** deutlich:
+     * $\ge 90.0\%$: $12.078,1\text{ QPS}$ vs. $7.897,4\text{ QPS}$ (**$+52,9\%$ schneller**)
+     * $\ge 92.0\%$: $10.453,5\text{ QPS}$ vs. $7.897,4\text{ QPS}$ (**$+32,4\%$ schneller**)
+     * $\ge 95.0\%$: $7.757,4\text{ QPS}$ vs. $6.210,1\text{ QPS}$ (**$+24,9\%$ schneller**)
+     * $\ge 97.0\%$: $5.126,8\text{ QPS}$ vs. $4.287,6\text{ QPS}$ (**$+19,6\%$ schneller**)
 
-2. **Die architektonischen Neuerungen in Phase 2**:
-   1. **64B-Aligned Contiguous Edge Topology Matrix**: Vollständige Trennung von Features und Topologie in `readonly_graph.h`. Beseitigt Cacheline-Splits und reduziert Kanten-Prefetches von 4 auf 3 Cachelines.
-   2. **Ausgerichtete 512-bit ZMM Loads**: Reine `_mm512_load_si512` Befehle für alle Vektoren ohne Skalar- oder Restschleifen.
-   3. **SIMD-Vektorisiertes Medoid-Scanning**: Einmalige Query-Vorab-Berechnung und ZMM-Pinning für alle 128 Medoide. Senkt Medoid-Latenz um 75%.
-   4. **Feingranulare Pareto-Auflösung**: Präzise Treffung der 99.9%-Schwelle bei ef=850 (1.35x) statt Überhang bei ef=900.
+2. **Reale Schwächen von DEG-QG (Wo Glass noch immer führt)**:
+   * **Bei $98.0\%$ bis $99.5\%$ Recall**: DEG und Glass liegen praktisch gleichauf (DEG: $4.526$ vs Glass: $4.288$ bei $98\%$; DEG: $2.644$ vs Glass: $2.710$ bei $99.4\%$).
+   * **Bei $\ge 99.9\%$ Recall**: **Glass führt unbestritten mit $1.763,8\text{ QPS}$ vs. DEG $1.576,7\text{ QPS}$ ($+11,9\%$ Vorsprung für Glass)**.
+
+3. **Einzig verbleibender echter Hebel für 99.9%**:
+   * Reines Code-Tuning der Suchschleife kann die fehlenden Kantenverbindungen des Standard-Graphen (`extend_k=64`) nicht kompensieren. Glass nutzt $L=400$ ($efConstruction=400$) beim HNSW-Bau und findet dadurch Abkürzungen zu isolierten Clustern, die DEG mit $ef=800$ nicht sieht.
+   * Einziger valider Weg: Ein verbesserter Offline-Graphbau (`extend_k=128`, `improve_k=48`).
