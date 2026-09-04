@@ -8,10 +8,10 @@
     "eps": 0.0,
     "ef": 60,
     "recall_100": 0.8733599999999999,
-    "qps": 13231.888824931384,
-    "search_time_ms": 0.07557500015536789,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 13424.170244063536,
+    "search_time_ms": 0.07449249985802453,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -22,10 +22,10 @@
     "eps": 0.0,
     "ef": 80,
     "recall_100": 0.90556,
-    "qps": 11787.893392432865,
-    "search_time_ms": 0.08483279978099745,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 11890.295397946531,
+    "search_time_ms": 0.0841021998639917,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -36,10 +36,10 @@
     "eps": 0.0,
     "ef": 100,
     "recall_100": 0.92555,
-    "qps": 10437.225855032255,
-    "search_time_ms": 0.0958108997438103,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 10488.490975086555,
+    "search_time_ms": 0.09534260003420059,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -50,10 +50,10 @@
     "eps": 0.0,
     "ef": 120,
     "recall_100": 0.93847,
-    "qps": 9098.07175741222,
-    "search_time_ms": 0.1099133999668993,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 9158.700116686847,
+    "search_time_ms": 0.10918580008728895,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -64,10 +64,10 @@
     "eps": 0.0,
     "ef": 150,
     "recall_100": 0.95253,
-    "qps": 7620.5339801382515,
-    "search_time_ms": 0.13122440010192804,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 7706.36883055817,
+    "search_time_ms": 0.12976280035218224,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -78,10 +78,10 @@
     "eps": 0.0,
     "ef": 200,
     "recall_100": 0.9671400000000001,
-    "qps": 6040.004143284543,
-    "search_time_ms": 0.165562800335465,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 6047.323933319799,
+    "search_time_ms": 0.1653624001337448,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -92,10 +92,10 @@
     "eps": 0.0,
     "ef": 250,
     "recall_100": 0.97428,
-    "qps": 5007.242979367013,
-    "search_time_ms": 0.1997106999042444,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 5036.020136122887,
+    "search_time_ms": 0.19856949991662987,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -106,10 +106,10 @@
     "eps": 0.0,
     "ef": 300,
     "recall_100": 0.97773,
-    "qps": 4286.427674129204,
-    "search_time_ms": 0.23329449976154137,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 4308.493288543853,
+    "search_time_ms": 0.23209970006428193,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -120,10 +120,10 @@
     "eps": 0.0,
     "ef": 350,
     "recall_100": 0.9817600000000001,
-    "qps": 3732.0924917632797,
-    "search_time_ms": 0.2679461996740429,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 3780.8555659244116,
+    "search_time_ms": 0.264490399742499,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -134,10 +134,10 @@
     "eps": 0.0,
     "ef": 400,
     "recall_100": 0.9841300000000001,
-    "qps": 3334.8440205720512,
-    "search_time_ms": 0.29986409973935224,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 3366.135197235809,
+    "search_time_ms": 0.297076600138098,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -148,10 +148,10 @@
     "eps": 0.0,
     "ef": 500,
     "recall_100": 0.98695,
-    "qps": 2754.487816615902,
-    "search_time_ms": 0.3630439002008643,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 2777.800926627457,
+    "search_time_ms": 0.35999699993408285,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -162,10 +162,10 @@
     "eps": 0.0,
     "ef": 600,
     "recall_100": 0.9895600000000001,
-    "qps": 2321.6928301859652,
-    "search_time_ms": 0.4307201999326935,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 2352.5758361892904,
+    "search_time_ms": 0.42506599983607884,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -176,10 +176,10 @@
     "eps": 0.0,
     "ef": 700,
     "recall_100": 0.9899700000000001,
-    "qps": 2013.3205321845342,
-    "search_time_ms": 0.496691899781581,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 2041.3858318301984,
+    "search_time_ms": 0.48986329992476385,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -190,10 +190,10 @@
     "eps": 0.0,
     "ef": 800,
     "recall_100": 0.9906000000000001,
-    "qps": 1780.1560657858129,
-    "search_time_ms": 0.561748500156682,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1798.989219796514,
+    "search_time_ms": 0.5558677000371972,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -204,10 +204,10 @@
     "eps": 0.0,
     "ef": 900,
     "recall_100": 0.99092,
-    "qps": 1611.5274491277119,
-    "search_time_ms": 0.62052930003847,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1606.3085515942942,
+    "search_time_ms": 0.6225454001396429,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -218,10 +218,10 @@
     "eps": 0.0,
     "ef": 1000,
     "recall_100": 0.9910800000000001,
-    "qps": 1458.8411317192952,
-    "search_time_ms": 0.6854755999520421,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1469.2345955404467,
+    "search_time_ms": 0.6806264996994287,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -232,10 +232,10 @@
     "eps": 0.0,
     "ef": 60,
     "recall_100": 0.87958,
-    "qps": 9084.261062098118,
-    "search_time_ms": 0.11008050001692027,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 11763.5987007361,
+    "search_time_ms": 0.08500800014007837,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -246,10 +246,10 @@
     "eps": 0.0,
     "ef": 80,
     "recall_100": 0.91325,
-    "qps": 8171.470131640991,
-    "search_time_ms": 0.12237699996330777,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 10410.723898926335,
+    "search_time_ms": 0.09605479981109966,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -260,10 +260,10 @@
     "eps": 0.0,
     "ef": 100,
     "recall_100": 0.9341099999999999,
-    "qps": 7496.246269022762,
-    "search_time_ms": 0.13340009974490386,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 9268.218542324516,
+    "search_time_ms": 0.10789559994009323,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -274,10 +274,10 @@
     "eps": 0.0,
     "ef": 120,
     "recall_100": 0.94742,
-    "qps": 6824.210378467505,
-    "search_time_ms": 0.14653710019774735,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 8366.436538740103,
+    "search_time_ms": 0.11952519993064925,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -288,10 +288,10 @@
     "eps": 0.0,
     "ef": 150,
     "recall_100": 0.9621900000000001,
-    "qps": 5968.731014283572,
-    "search_time_ms": 0.16753979993518442,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 7159.149317326843,
+    "search_time_ms": 0.13968140007636975,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -302,10 +302,10 @@
     "eps": 0.0,
     "ef": 200,
     "recall_100": 0.9768399999999999,
-    "qps": 4948.214455123567,
-    "search_time_ms": 0.202093100262573,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 5734.908451319026,
+    "search_time_ms": 0.17437069980951492,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -316,10 +316,10 @@
     "eps": 0.0,
     "ef": 250,
     "recall_100": 0.9840699999999999,
-    "qps": 4253.7932110806,
-    "search_time_ms": 0.23508430014771875,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 4815.195214115922,
+    "search_time_ms": 0.20767590004834346,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -330,10 +330,10 @@
     "eps": 0.0,
     "ef": 300,
     "recall_100": 0.98717,
-    "qps": 3704.1084120758605,
-    "search_time_ms": 0.2699704999831738,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 4139.941622770017,
+    "search_time_ms": 0.24154929975338746,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -344,10 +344,10 @@
     "eps": 0.0,
     "ef": 350,
     "recall_100": 0.99088,
-    "qps": 3263.6670958104323,
-    "search_time_ms": 0.30640379997203127,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 3644.180736117269,
+    "search_time_ms": 0.27441009994072374,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -357,11 +357,11 @@
     "rerank_factor": 1.15,
     "eps": 0.0,
     "ef": 400,
-    "recall_100": 0.99305,
-    "qps": 2959.94250712066,
-    "search_time_ms": 0.3378443998808507,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "recall_100": 0.9930599999999999,
+    "qps": 3262.88119595128,
+    "search_time_ms": 0.30647760060674045,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -372,10 +372,10 @@
     "eps": 0.0,
     "ef": 500,
     "recall_100": 0.9956900000000001,
-    "qps": 2477.9321575250087,
-    "search_time_ms": 0.4035622997034807,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 2696.069642713391,
+    "search_time_ms": 0.37091030000010505,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -386,10 +386,10 @@
     "eps": 0.0,
     "ef": 600,
     "recall_100": 0.99803,
-    "qps": 2147.376141827941,
-    "search_time_ms": 0.4656846001598751,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 2292.926391335858,
+    "search_time_ms": 0.43612389991176315,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -400,10 +400,10 @@
     "eps": 0.0,
     "ef": 700,
     "recall_100": 0.99836,
-    "qps": 1877.0759301726562,
-    "search_time_ms": 0.5327434995706426,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1985.5420769225009,
+    "search_time_ms": 0.5036407999723451,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -414,10 +414,10 @@
     "eps": 0.0,
     "ef": 800,
     "recall_100": 0.9988900000000001,
-    "qps": 1670.2027640950885,
-    "search_time_ms": 0.5987297000683611,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1762.6546711362819,
+    "search_time_ms": 0.5673260998737533,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -428,10 +428,10 @@
     "eps": 0.0,
     "ef": 900,
     "recall_100": 0.99902,
-    "qps": 1509.9848505234906,
-    "search_time_ms": 0.6622582999116275,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1584.2869159343336,
+    "search_time_ms": 0.6311987998778932,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -442,10 +442,10 @@
     "eps": 0.0,
     "ef": 1000,
     "recall_100": 0.99906,
-    "qps": 1373.7248735179885,
-    "search_time_ms": 0.7279478003765689,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1438.2998832320702,
+    "search_time_ms": 0.695265300135361,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -456,10 +456,10 @@
     "eps": 0.0,
     "ef": 60,
     "recall_100": 0.87967,
-    "qps": 8892.430030560692,
-    "search_time_ms": 0.11245520027296152,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 11639.058831789594,
+    "search_time_ms": 0.08591759990667924,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -469,11 +469,11 @@
     "rerank_factor": 1.2,
     "eps": 0.0,
     "ef": 80,
-    "recall_100": 0.91328,
-    "qps": 8008.014420328751,
-    "search_time_ms": 0.12487490000785328,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "recall_100": 0.9132899999999999,
+    "qps": 10267.024776663839,
+    "search_time_ms": 0.09739920003630687,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -484,10 +484,10 @@
     "eps": 0.0,
     "ef": 100,
     "recall_100": 0.93418,
-    "qps": 7369.082710769552,
-    "search_time_ms": 0.13570210014586337,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 9148.293832252237,
+    "search_time_ms": 0.10931000013079029,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -498,10 +498,10 @@
     "eps": 0.0,
     "ef": 120,
     "recall_100": 0.94751,
-    "qps": 6814.992716569334,
-    "search_time_ms": 0.14673529988795053,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 8341.46625538819,
+    "search_time_ms": 0.11988300010852981,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -512,10 +512,10 @@
     "eps": 0.0,
     "ef": 150,
     "recall_100": 0.96229,
-    "qps": 5928.079341975271,
-    "search_time_ms": 0.16868870038888417,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 7124.907466361134,
+    "search_time_ms": 0.1403526999783935,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -526,10 +526,10 @@
     "eps": 0.0,
     "ef": 200,
     "recall_100": 0.97696,
-    "qps": 4884.348402516523,
-    "search_time_ms": 0.20473559983656742,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 5719.217320697985,
+    "search_time_ms": 0.1748490997852059,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -540,10 +540,10 @@
     "eps": 0.0,
     "ef": 250,
     "recall_100": 0.9841500000000001,
-    "qps": 4169.807926331473,
-    "search_time_ms": 0.23981919974903576,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 4801.674063249803,
+    "search_time_ms": 0.20826069967006333,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -554,10 +554,10 @@
     "eps": 0.0,
     "ef": 300,
     "recall_100": 0.9872199999999999,
-    "qps": 3680.096562467659,
-    "search_time_ms": 0.2717320002411725,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 4141.613357441024,
+    "search_time_ms": 0.24145179998595268,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -568,10 +568,10 @@
     "eps": 0.0,
     "ef": 350,
     "recall_100": 0.99094,
-    "qps": 3289.6695513277205,
-    "search_time_ms": 0.3039818998222472,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 3640.047365650688,
+    "search_time_ms": 0.27472169989778195,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -581,11 +581,11 @@
     "rerank_factor": 1.2,
     "eps": 0.0,
     "ef": 400,
-    "recall_100": 0.9930999999999999,
-    "qps": 2955.255655680713,
-    "search_time_ms": 0.33838020006078295,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "recall_100": 0.9931099999999999,
+    "qps": 3250.708981905407,
+    "search_time_ms": 0.30762519978452474,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -596,10 +596,10 @@
     "eps": 0.0,
     "ef": 500,
     "recall_100": 0.9957,
-    "qps": 2486.613318160882,
-    "search_time_ms": 0.40215339984570164,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 2697.507446778214,
+    "search_time_ms": 0.37071260032826103,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -610,10 +610,10 @@
     "eps": 0.0,
     "ef": 600,
     "recall_100": 0.9980399999999999,
-    "qps": 2138.3824239032247,
-    "search_time_ms": 0.4676432002161164,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 2281.858335706926,
+    "search_time_ms": 0.4382393001142191,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -624,10 +624,10 @@
     "eps": 0.0,
     "ef": 700,
     "recall_100": 0.99837,
-    "qps": 1877.204894302422,
-    "search_time_ms": 0.5327069000486517,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1983.6424866070397,
+    "search_time_ms": 0.5041231001814594,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -638,10 +638,10 @@
     "eps": 0.0,
     "ef": 800,
     "recall_100": 0.9989000000000001,
-    "qps": 1675.5043930512556,
-    "search_time_ms": 0.5968352002819302,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1764.5622255754083,
+    "search_time_ms": 0.5667128002096433,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -652,10 +652,10 @@
     "eps": 0.0,
     "ef": 900,
     "recall_100": 0.99903,
-    "qps": 1504.919884374076,
-    "search_time_ms": 0.6644871998723829,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1590.9830715664586,
+    "search_time_ms": 0.6285422000219114,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   },
   {
     "config": "['cosine', 48, 'LowLID', False]",
@@ -666,9 +666,9 @@
     "eps": 0.0,
     "ef": 1000,
     "recall_100": 0.9990699999999999,
-    "qps": 1370.419817078758,
-    "search_time_ms": 0.7297034000366693,
-    "build_time_s": 2.7895092964172363,
-    "index_size_kb": 1128112.0
+    "qps": 1446.1119402379709,
+    "search_time_ms": 0.6915093999123201,
+    "build_time_s": 2.920163154602051,
+    "index_size_kb": 1128044.0
   }
 ]
